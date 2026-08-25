@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block title %}Login | EXPRESS{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        background-color: #0a0a0c !important;
+        color: #ffffff !important;
+        overflow-x: hidden;
+    }
+    .otp-input::-webkit-outer-spin-button,
+    .otp-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(227, 93, 18, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main class="flex-1 flex flex-col items-center justify-center relative bg-[#0a0a0c] min-h-screen text-white overflow-hidden px-4 py-8 select-none">
+    <!-- Ambient luxury dark glow -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div class="w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full bg-[#e35d12]/[0.06] blur-[120px]"></div>
+    </div>
+    
+    <!-- Top left branding -->
+    <div class="absolute top-6 sm:top-8 left-6 sm:left-8 z-20">
+        <a href="/" class="text-xl font-display italic text-white/90 hover:text-white tracking-widest transition-colors flex items-center gap-2">
+            <span>EXPRESS</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#e35d12]"></span>
+        </a>
+    </div>
+
+    <div id="login-container" class="relative z-10 w-full max-w-md px-2 sm:px-4 my-auto">
+        
+        <!-- ════════ Step 1: Mobile Number ════════ -->
+        <div id="step-1" class="step-panel transition-all duration-500">
+            <p class="text-[10px] uppercase tracking-[0.3em] text-[#e35d12] mb-3 font-mono">Express Membership</p>
+            <h1 class="text-3xl sm:text-4xl font-display italic text-white mb-2 leading-tight">Enter your mobile number</h1>
+            <p class="text-gray-400 mb-10 text-sm tracking-wide">To log in or apply for your Express card</p>
+            
+            <div class="flex items-center gap-3 sm:gap-4 mb-8 border-b-2 border-white/20 pb-3 focus-within:border-white transition-colors">
+                <span class="text-2xl sm:text-3xl text-gray-400 font-mono font-light">+91</span>
+                <input type="tel" id="phone-input" maxlength="10" placeholder="" class="w-full bg-transparent outline-none text-2xl sm:text-3xl text-white tracking-wider font-mono" autofocus autocomplete="tel-national" inputmode="numeric">
+            </div>
+            
+            <button id="send-otp-btn" class="w-full py-4 rounded-2xl bg-white text-black font-semibold text-base sm:text-lg opacity-30 cursor-not-allowed transition-all duration-300 hover:bg-gray-100 active:scale-[0.99]">
+                Continue
+            </button>
+            <p class="text-center text-xs text-gray-500 mt-5 font-mono">Press Enter ↵ to continue</p>
+        </div>
+
+        <!-- ════════ Step 2: OTP ════════ -->
+        <div id="step-2" class="step-panel transition-all duration-500 hidden">
+            <p class="text-[10px] uppercase tracking-[0.3em] text-[#e35d12] mb-3 font-mono">Instant Verification</p>
+            <h1 class="text-3xl sm:text-4xl font-display italic text-white mb-2 leading-tight">Enter OTP</h1>
+            <p class="text-gray-400 mb-10 text-sm tracking-wide">Sent to <span id="display-phone" class="text-white font-mono font-medium"></span></p>
+            
+            <div class="grid grid-cols-6 gap-2 sm:gap-3 mb-8">
+                <input type="text" maxlength="1" class="otp-input w-full h-14 sm:h-16 bg-white/[0.04] border-b-2 border-white/20 text-3xl sm:text-4xl text-center text-white focus:border-white focus:bg-white/[0.08] focus:outline-none transition-all rounded-t-lg font-mono" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-input w-full h-14 sm:h-16 bg-white/[0.04] border-b-2 border-white/20 text-3xl sm:text-4xl text-center text-white focus:border-white focus:bg-white/[0.08] focus:outline-none transition-all rounded-t-lg font-mono" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-input w-full h-14 sm:h-16 bg-white/[0.04] border-b-2 border-white/20 text-3xl sm:text-4xl text-center text-white focus:border-white focus:bg-white/[0.08] focus:outline-none transition-all rounded-t-lg font-mono" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-input w-full h-14 sm:h-16 bg-white/[0.04] border-b-2 border-white/20 text-3xl sm:text-4xl text-center text-white focus:border-white focus:bg-white/[0.08] focus:outline-none transition-all rounded-t-lg font-mono" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-input w-full h-14 sm:h-16 bg-white/[0.04] border-b-2 border-white/20 text-3xl sm:text-4xl text-center text-white focus:border-white focus:bg-white/[0.08] focus:outline-none transition-all rounded-t-lg font-mono" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-input w-full h-14 sm:h-16 bg-white/[0.04] border-b-2 border-white/20 text-3xl sm:text-4xl text-center text-white focus:border-white focus:bg-white/[0.08] focus:outline-none transition-all rounded-t-lg font-mono" inputmode="numeric">
+            </div>
+            
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-xs sm:text-sm text-gray-500 font-mono">Demo OTP: <strong class="text-gray-300">123456</strong></span>
+                <button id="resend-btn" class="text-xs sm:text-sm text-gray-500 hover:text-white transition-colors" disabled>Wait <span id="timer">30</span>s</button>
+            </div>
+        </div>
+
+        <!-- ════════ Step 3: Enter DOB ════════ -->
+        <div id="step-3" class="step-panel transition-all duration-500 hidden">
+            <p class="text-[10px] uppercase tracking-[0.3em] text-[#e35d12] mb-3 font-mono">Age Eligibility</p>
+            <h1 class="text-3xl sm:text-4xl font-display italic text-white mb-2 leading-tight">Enter DOB</h1>
+            <p class="text-gray-400 mb-10 text-sm tracking-wide">You must be 21+ to join Express</p>
+            
+            <div class="mb-8 border-b-2 border-white/20 pb-3 focus-within:border-white transition-colors">
+                <div class="relative">
+                    <input type="text" id="dob-input" maxlength="10" placeholder="" class="w-full bg-transparent outline-none text-2xl sm:text-3xl text-white tracking-widest font-mono text-center relative z-10" inputmode="numeric" autocomplete="off">
+                    <span id="dob-preview" class="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl text-gray-600 tracking-widest font-mono pointer-events-none transition-opacity duration-200">DD/MM/YYYY</span>
+                </div>
+            </div>
+            
+            <button id="check-age-btn" class="w-full py-4 rounded-2xl bg-white text-black font-semibold text-base sm:text-lg opacity-30 cursor-not-allowed transition-all duration-300 hover:bg-gray-100 active:scale-[0.99]">
+                Verify Age
+            </button>
+            <p class="text-center text-xs text-gray-500 mt-5 font-mono">Format: Day / Month / Year (e.g. 15/08/1998)</p>
+        </div>
+
+        <!-- ════════ Step 4: Terms and Conditions ════════ -->
+        <div id="step-4" class="step-panel transition-all duration-500 hidden">
+            <p class="text-[10px] uppercase tracking-[0.3em] text-[#e35d12] mb-3 font-mono">Cardholder Agreement</p>
+            <h1 class="text-3xl sm:text-4xl font-display italic text-white mb-2 leading-tight">Terms & conditions</h1>
+            <p class="text-gray-400 mb-6 text-sm tracking-wide">Review essential cardholder terms to activate your profile</p>
+            
+            <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 text-xs sm:text-sm text-gray-300 space-y-4 max-h-[260px] overflow-y-auto custom-scrollbar leading-relaxed">
+                <div class="flex gap-3">
+                    <span class="text-[#e35d12] font-mono font-bold">01.</span>
+                    <p><strong class="text-white">Credit Assessment & Bureau Reporting:</strong> You authorize Express and its RBI-regulated lending partners to pull your credit bureau history (CIBIL/Experian) and report regular repayment performance.</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="text-[#e35d12] font-mono font-bold">02.</span>
+                    <p><strong class="text-white">Transparent Lending Rates:</strong> Express offers monthly interest rates starting from 0.99% p.m. No hidden maintenance charges or surprise fee structures.</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="text-[#e35d12] font-mono font-bold">03.</span>
+                    <p><strong class="text-white">Zero-Liability Fraud Protection:</strong> All Express metal and plastic cards are secured with 24/7 fraud monitoring and up to ₹2,00,000 comprehensive fraud coverage.</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="text-[#e35d12] font-mono font-bold">04.</span>
+                    <p><strong class="text-white">Repayment Obligation:</strong> You agree to repay billed amounts on or before the monthly due date via UPI, Net Banking, or Auto-Debit.</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="text-[#e35d12] font-mono font-bold">05.</span>
+                    <p><strong class="text-white">Digital Statements & Alerts:</strong> You consent to receive monthly digital billing statements, OTPs, and instant transaction notifications via WhatsApp and SMS.</p>
+                </div>
+            </div>
+
+            <label class="flex items-start gap-3 sm:gap-4 mb-6 cursor-pointer group">
+                <div class="relative flex items-center justify-center mt-0.5 shrink-0">
+                    <input type="checkbox" id="terms-checkbox" class="peer sr-only">
+                    <div class="w-6 h-6 border-2 border-gray-600 rounded-lg bg-white/[0.05] peer-checked:bg-[#e35d12] peer-checked:border-[#e35d12] transition-colors"></div>
+                    <svg class="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <span class="text-xs sm:text-sm text-gray-400 group-hover:text-gray-200 transition-colors select-none">
+                    I have read and accept the Express Credit Card Terms & Conditions, Key Fact Statement, and Privacy Policy.
+                </span>
+            </label>
+            
+            <button id="accept-terms-btn" class="w-full py-4 rounded-2xl bg-white text-black font-semibold text-base sm:text-lg opacity-30 cursor-not-allowed transition-all duration-300 hover:bg-gray-100 active:scale-[0.99]">
+                Accept & Continue
+            </button>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let userPhone = '';
+    let timerInterval;
+
+    function showStep(currentId, nextId) {
+        const cur = document.getElementById(currentId);
+        const nxt = document.getElementById(nextId);
+        gsap.to(cur, {
+            opacity: 0, y: -20, scale: 0.98, duration: 0.35, ease: "power2.in",
+            onComplete: () => {
+                cur.classList.add('hidden');
+                nxt.classList.remove('hidden');
+                gsap.fromTo(nxt, {opacity: 0, y: 20, scale: 0.98}, {opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out"});
+            }
+        });
+    }
+
+    function activate(btn) { 
+        btn.classList.remove('opacity-30', 'cursor-not-allowed');
+        btn.classList.add('opacity-100', 'cursor-pointer');
+    }
+    function deactivate(btn) { 
+        btn.classList.add('opacity-30', 'cursor-not-allowed');
+        btn.classList.remove('opacity-100', 'cursor-pointer');
+    }
+
+    // ════════════ Step 1: Phone ════════════
+    const phoneInput = document.getElementById('phone-input');
+    const sendOtpBtn = document.getElementById('send-otp-btn');
+    
+    phoneInput.addEventListener('input', e => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        if (e.target.value.length === 10) activate(sendOtpBtn); else deactivate(sendOtpBtn);
+    });
+    phoneInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && phoneInput.value.length === 10) sendOtpBtn.click();
+    });
+
+    sendOtpBtn.addEventListener('click', async () => {
+        if (phoneInput.value.length !== 10) return;
+        userPhone = phoneInput.value;
+        sendOtpBtn.innerText = "Sending..."; 
+        deactivate(sendOtpBtn);
+        try {
+            const res = await fetch('/api/send-otp', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({phone: userPhone}) 
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message || 'Unable to send OTP');
+            
+            document.getElementById('display-phone').innerText = '+91 ' + userPhone;
+            showStep('step-1', 'step-2');
+            startTimer();
+            setTimeout(() => document.querySelectorAll('.otp-input')[0].focus(), 450);
+        } catch(e) { 
+            sendOtpBtn.innerText = "Continue"; 
+            activate(sendOtpBtn); 
+        }
+    });
+
+    // ════════════ Step 2: OTP ════════════
+    const otpInputs = document.querySelectorAll('.otp-input');
+    otpInputs.forEach((input, i) => {
+        input.addEventListener('input', e => {
+            const val = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = val;
+            if (val && i < 5) otpInputs[i + 1].focus();
+            checkOtp();
+        });
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                checkOtp();
+            } else if (e.key === 'Backspace') {
+                if (!e.target.value && i > 0) {
+                    otpInputs[i - 1].focus();
+                }
+            }
+        });
+        // Support OTP paste
+        input.addEventListener('paste', e => {
+            e.preventDefault();
+            const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+            if (pastedData.length > 0) {
+                pastedData.split('').forEach((char, idx) => {
+                    if (otpInputs[idx]) otpInputs[idx].value = char;
+                });
+                const focusIdx = Math.min(pastedData.length, 5);
+                otpInputs[focusIdx].focus();
+                checkOtp();
+            }
+        });
+    });
+
+    async function checkOtp() {
+        const otp = Array.from(otpInputs).map(i => i.value).join('');
+        if (otp.length !== 6) return;
+        otpInputs.forEach(i => i.disabled = true);
+        
+        try {
+            const res = await fetch('/api/verify-otp', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({phone: userPhone, otp}) 
+            });
+            const data = await res.json();
+            if (data.success) {
+                if (data.user.has_card) { 
+                    gsap.to("body", {opacity: 0, scale: 0.98, duration: 0.6, onComplete: () => { window.location.href = '/home'; }}); 
+                } else if (data.user.age && data.user.age < 21) { 
+                    window.location.href = '/waitlist'; 
+                } else if (data.user.age && data.user.terms_accepted) { 
+                    gsap.to("body", {opacity: 0, scale: 0.98, duration: 0.6, onComplete: () => { window.location.href = '/home'; }}); 
+                } else if (data.user.age) { 
+                    showStep('step-2', 'step-4'); 
+                } else { 
+                    // Ask for DOB
+                    showStep('step-2', 'step-3'); 
+                    setTimeout(() => document.getElementById('dob-input').focus(), 450);
+                }
+            } else { 
+                otpInputs.forEach(i => { i.disabled = false; i.value = ''; }); 
+                otpInputs[0].focus(); 
+            }
+        } catch(e) { 
+            otpInputs.forEach(i => { i.disabled = false; i.value = ''; }); 
+            otpInputs[0].focus(); 
+        }
+    }
+
+    function startTimer() {
+        let t = 30;
+        const span = document.getElementById('timer');
+        const btn = document.getElementById('resend-btn');
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            t--;
+            span.innerText = t;
+            if (t <= 0) { 
+                clearInterval(timerInterval); 
+                btn.innerHTML = "Resend OTP"; 
+                btn.disabled = false; 
+                btn.classList.replace('text-gray-500', 'text-white'); 
+            }
+        }, 1000);
+    }
+
+    document.getElementById('resend-btn').addEventListener('click', async () => {
+        if (!userPhone) return;
+        const btn = document.getElementById('resend-btn');
+        btn.disabled = true;
+        btn.innerHTML = 'Sending…';
+        try {
+            await fetch('/api/send-otp', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({phone: userPhone}) 
+            });
+            btn.classList.replace('text-white', 'text-gray-500');
+            btn.innerHTML = 'Wait <span id="timer">30</span>s';
+            startTimer();
+        } catch (e) {
+            btn.disabled = false;
+            btn.textContent = 'Resend OTP';
+        }
+    });
+
+    // ════════════ Step 3: Enter DOB (DD/MM/YYYY) ════════════
+    const dobInput = document.getElementById('dob-input');
+    const dobPreview = document.getElementById('dob-preview');
+    const checkAgeBtn = document.getElementById('check-age-btn');
+
+    dobInput.addEventListener('focus', () => {
+        if (!dobInput.value) dobPreview.style.opacity = '0.35';
+    });
+
+    dobInput.addEventListener('blur', () => {
+        if (!dobInput.value) dobPreview.style.opacity = '1';
+    });
+
+    dobInput.addEventListener('input', e => {
+        let raw = e.target.value.replace(/[^0-9]/g, '');
+        if (raw.length > 8) raw = raw.slice(0, 8);
+        
+        let formatted = '';
+        if (raw.length > 0) {
+            formatted = raw.slice(0, Math.min(2, raw.length));
+        }
+        if (raw.length > 2) {
+            formatted += '/' + raw.slice(2, Math.min(4, raw.length));
+        }
+        if (raw.length > 4) {
+            formatted += '/' + raw.slice(4, 8);
+        }
+        
+        e.target.value = formatted;
+        
+        // Hide preview immediately once user types anything
+        dobPreview.style.opacity = formatted.length > 0 ? '0' : '1';
+        
+        // Enable button when full date is entered
+        if (formatted.length === 10) {
+            activate(checkAgeBtn);
+        } else {
+            deactivate(checkAgeBtn);
+        }
+    });
+
+    dobInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && dobInput.value.length === 10) {
+            checkAgeBtn.click();
+        }
+        // Handle backspace when ending on a slash
+        if (e.key === 'Backspace' && dobInput.value.endsWith('/')) {
+            e.preventDefault();
+            dobInput.value = dobInput.value.slice(0, -1);
+            dobInput.dispatchEvent(new Event('input'));
+        }
+    });
+
+    checkAgeBtn.addEventListener('click', async () => {
+        const parts = dobInput.value.split('/');
+        if (parts.length !== 3 || parts[2].length !== 4) return;
+        const dd = parseInt(parts[0], 10), mm = parseInt(parts[1], 10), yyyy = parseInt(parts[2], 10);
+        
+        if (dd < 1 || dd > 31 || mm < 1 || mm > 12 || yyyy < 1920 || yyyy > new Date().getFullYear()) {
+            alert('Please enter a valid Date of Birth');
+            return;
+        }
+        
+        checkAgeBtn.innerText = "Checking..."; 
+        deactivate(checkAgeBtn);
+        
+        const dob = `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+        const birthDate = new Date(yyyy, mm - 1, dd);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
+        try {
+            const res = await fetch('/api/check-age', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({dob}) 
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message || 'Verification failed');
+            
+            if (!data.eligible || age < 21) { 
+                window.location.href = '/waitlist'; 
+            } else { 
+                showStep('step-3', 'step-4'); 
+            }
+        } catch(e) { 
+            checkAgeBtn.innerText = "Verify Age"; 
+            activate(checkAgeBtn); 
+        }
+    });
+
+    // ════════════ Step 4: Terms & Conditions ════════════
+    const termsCheckbox = document.getElementById('terms-checkbox');
+    const acceptBtn = document.getElementById('accept-terms-btn');
+    
+    termsCheckbox.addEventListener('change', e => { 
+        if (e.target.checked) activate(acceptBtn); else deactivate(acceptBtn); 
+    });
+    
+    acceptBtn.addEventListener('click', async () => {
+        if (!termsCheckbox.checked) return;
+        acceptBtn.innerText = "Finalizing Membership..."; 
+        deactivate(acceptBtn);
+        try {
+            const res = await fetch('/api/accept-terms', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({}) 
+            });
+            if (!res.ok) throw new Error('Unable to complete setup');
+            
+            // Smooth cinematic exit transition to the main website
+            gsap.to("body", {
+                opacity: 0, 
+                scale: 0.98,
+                duration: 0.8, 
+                ease: "power2.inOut", 
+                onComplete: () => { 
+                    window.location.href = '/home'; 
+                }
+            });
+        } catch(e) { 
+            acceptBtn.innerText = "Accept & Continue"; 
+            activate(acceptBtn); 
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full antialiased scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}EXPRESS{% endblock %} — I Am Worth It</title>
+  <meta name="description" content="The premium credit card with unbeatable interest rates.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Instrument Serif', 'Georgia', 'serif'],
+          },
+          colors: {
+            primary: '#e35d12',
+            accent: '#c2186f',
+            secondary: '#2f6fae',
+            express: {
+              orange: '#e35d12',
+              pink: '#c2186f',
+              blue: '#2f6fae',
+              darkbg: '#0a0a0c',
+              cardbg: '#121216',
+            }
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #0a0a0c;
+        color: #ffffff;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      body {
+        background-color: #faf9f7;
+        color: #121216;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+  {% block head %}{% endblock %}
+</head>
+<body class="flex min-h-full flex-col font-sans antialiased transition-colors duration-300">
+  {% block body %}{% endblock %}
+  <script src="/static/js/app.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

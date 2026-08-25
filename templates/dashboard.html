@@ -1,0 +1,826 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="min-h-screen bg-white dark:bg-[#0a0a0c] text-gray-900 dark:text-white pb-20">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-[#0a0a0c]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="/home" class="text-3xl font-serif italic text-primary font-bold tracking-tight">EXPRESS</a>
+            <nav class="hidden md:flex gap-8 items-center font-medium">
+                <a href="/home" class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">Home</a>
+                <a href="/dashboard" class="text-primary border-b-2 border-primary pb-1">Dashboard</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-primary font-bold">
+                    {{ user.name[:1] if user.name else 'U' }}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 mt-10">
+        <!-- Dashboard Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-semibold mb-2">Welcome back, {{ user.name or "User" }}</h1>
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 text-sm rounded-full font-medium {% if card.card_type == 'Premium' %}bg-accent/10 text-accent border border-accent/20{% else %}bg-secondary/10 text-secondary border border-secondary/20{% endif %}">
+                        Express {{ card.card_type }}
+                    </span>
+                    {% if card.status == 'shipped' %}
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        Your card is on the way • Arriving by {{ card.delivery_date }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 stat-cards">
+            <!-- Stat 1 -->
+            <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">Credit Limit</h3>
+                <div class="text-3xl font-bold font-serif italic" id="credit-limit-display">₹{{ card.credit_limit }}</div>
+                <p class="text-xs text-gray-500 mt-2">{{ card.utilisation }}% of your limit used</p>
+            </div>
+            
+            <!-- Stat 2 -->
+            <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">Available Balance</h3>
+                <div class="text-3xl font-bold font-serif italic text-green-600 dark:text-green-400">₹{{ card.available_limit }}</div>
+            </div>
+            
+            <!-- Stat 3 -->
+            <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-2">Next Payment</h3>
+                <div class="text-3xl font-bold font-serif italic text-accent">No dues</div>
+                <p class="text-xs text-gray-500 mt-2">{% if card.spent %}Your current balance is up to date{% else %}Your credit has not been used yet{% endif %}</p>
+            </div>
+        </div>
+
+        <!-- Limit Increase Banner -->
+        {% if card.on_time_payments and card.on_time_payments >= 3 %}
+        <div id="limit-increase-banner" class="mb-10 bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl p-6 border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+                <h3 class="text-lg font-bold mb-1 flex items-center gap-2 text-primary">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    You're eligible for a limit increase!
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300 text-sm">Your on-time payment track record qualifies you for a 10% credit limit increase.</p>
+            </div>
+            <button id="btn-increase-limit" class="shrink-0 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-full font-medium transition-colors shadow-lg shadow-primary/30">
+                Increase My Limit
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 dark:border-gray-800 mb-8 flex gap-8 overflow-x-auto tab-container">
+            <button class="tab-btn active pb-3 font-medium text-primary border-b-2 border-primary whitespace-nowrap" data-target="overview">Overview</button>
+            <button class="tab-btn pb-3 font-medium text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 border-b-2 border-transparent whitespace-nowrap" data-target="transactions">Transactions</button>
+            <button class="tab-btn pb-3 font-medium text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 border-b-2 border-transparent whitespace-nowrap" data-target="emi">EMI Plans</button>
+            <button class="tab-btn pb-3 font-medium text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 border-b-2 border-transparent whitespace-nowrap" data-target="profile">Profile</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="relative min-h-[400px]">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content absolute top-0 left-0 w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Mini Card -->
+                    <div class="lg:col-span-1">
+                        <div class="express-card {% if card.card_type == 'Premium' %}metal-card{% else %}plastic-card{% endif %} aspect-[1.586/1] rounded-2xl p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group
+                            {% if card.color == 'gold' %} bg-gradient-to-br from-[#FFD700] via-[#FDB931] to-[#996515] text-black
+                            {% elif card.color == 'rosegold' %} bg-gradient-to-br from-[#B76E79] via-[#E0BFB8] to-[#C07C88] text-white
+                            {% elif card.color == 'black' %} bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white
+                            {% elif card.color == 'ultra' %} bg-gradient-to-br from-gray-300 via-gray-100 to-gray-400 text-black
+                            {% elif card.color == 'ultrablue' %} bg-gradient-to-br from-blue-400 via-blue-300 to-blue-500 text-white
+                            {% endif %}">
+                            
+                            <div class="flex justify-between items-start">
+                                <div class="font-serif italic font-bold text-xl tracking-wider">EXPRESS</div>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <div class="font-mono tracking-widest text-lg mb-2 opacity-90">•••• •••• •••• {{ card.last4 | default('1234') }}</div>
+                                <div class="flex justify-between items-end">
+                                    <div class="font-medium tracking-widest uppercase">{{ user.name or 'Express Member' }}</div>
+                                    <div class="text-xs uppercase font-bold tracking-widest opacity-80">Contactless</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex flex-col gap-3">
+                            <div class="rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
+                                <span class="text-sm text-gray-500">CVV</span>
+                                <div class="flex items-center gap-3"><span id="cvv-value" class="font-mono tracking-[.25em]">•••</span><button id="cvv-toggle" data-cvv="482" type="button" class="grid size-8 place-items-center rounded-full text-primary hover:bg-primary/10 transition-colors" aria-label="Show CVV"><svg aria-hidden="true" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg><span class="sr-only">Show CVV</span></button></div>
+                            </div>
+                            <button onclick="document.querySelector('[data-target=\'transactions\']').click()" class="w-full py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">View All Transactions</button>
+                            <button onclick="openManageCardModal()" class="w-full py-3 rounded-xl bg-gray-100 dark:bg-gray-800 font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-primary">Manage Card</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Credit use and recent activity -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl border border-gray-200 dark:border-gray-800 p-5 mb-5">
+                            <div class="flex items-end justify-between gap-4 mb-3"><div><p class="text-sm text-gray-500">Credit usage</p><h3 class="text-2xl font-display italic">₹{{ card.available_limit }} available</h3></div><span class="text-sm font-semibold text-primary">{{ card.utilisation }}%</span></div>
+                            <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-[#e35d12] to-[#c2186f]" style="width: {{ card.utilisation }}%"></div></div>
+                            {% if not card.spent %}<p class="mt-3 text-sm text-green-600 dark:text-green-400">Your credit is not used. You have no dues right now.</p>{% endif %}
+                        </div>
+                        <h3 class="text-xl font-semibold mb-4">Recent Transactions</h3>
+                        <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                            {% for txn in transactions[:5] %}
+                            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 last:border-0 hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                        {{ txn.merchant[:1] }}
+                                    </div>
+                                    <div>
+                                        <div class="font-medium">{{ txn.merchant }}</div>
+                                        <div class="text-sm text-gray-500">{{ txn.date }}</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium font-mono">₹{{ txn.amount }}</div>
+                                    {% if txn.is_emi %}
+                                    <span class="text-xs text-primary font-medium">EMI active</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="p-8 text-center text-gray-500">No recent transactions</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Tab -->
+            <div id="transactions" class="tab-content absolute top-0 left-0 w-full opacity-0 pointer-events-none">
+                <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                    <th class="p-4 font-medium text-gray-600 dark:text-gray-300">Date</th>
+                                    <th class="p-4 font-medium text-gray-600 dark:text-gray-300">Merchant</th>
+                                    <th class="p-4 font-medium text-gray-600 dark:text-gray-300">Amount</th>
+                                    <th class="p-4 font-medium text-gray-600 dark:text-gray-300 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for txn in transactions %}
+                                <tr class="border-b border-gray-200 dark:border-gray-800 last:border-0 hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors">
+                                    <td class="p-4 text-sm text-gray-500 dark:text-gray-400">{{ txn.date }}</td>
+                                    <td class="p-4 font-medium">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs">
+                                                {{ txn.merchant[:1] }}
+                                            </div>
+                                            {{ txn.merchant }}
+                                        </div>
+                                    </td>
+                                    <td class="p-4 font-mono font-medium">₹{{ txn.amount }}</td>
+                                    <td class="p-4 text-right" id="action-td-{{ txn.id }}">
+                                        {% if txn.is_emi %}
+                                        <span class="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full border border-primary/20">{{ txn.emi_paid }} of {{ txn.emi_total }} EMIs paid</span>
+                                        {% else %}
+                                        <button onclick="showEMIModal('{{ txn.id }}', '{{ txn.amount|replace(',', '') }}')" class="text-sm text-accent hover:text-accent/80 font-medium transition-colors">Convert to EMI</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="p-8 text-center text-gray-500">No transactions found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMI Plans Tab -->
+            <div id="emi" class="tab-content absolute top-0 left-0 w-full opacity-0 pointer-events-none">
+                <div class="mb-6 bg-primary/5 border border-primary/20 rounded-2xl p-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-gray-600 dark:text-gray-300 font-medium mb-1">Total Monthly EMI Obligation</h3>
+                        <div class="text-2xl font-bold font-serif italic text-primary">₹{{ emi_total_monthly | default('0') }}</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for plan in payments %}
+                    {% if plan.is_emi %}
+                    <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h4 class="font-medium text-lg">{{ plan.merchant }}</h4>
+                                <div class="text-sm text-gray-500">Original: ₹{{ plan.original_amount }}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-accent">₹{{ plan.emi_amount }}/mo</div>
+                                <div class="text-xs text-gray-500">{{ plan.months_remaining }} months left</div>
+                            </div>
+                        </div>
+                        <div class="mb-2 text-sm text-gray-600 dark:text-gray-400 flex justify-between">
+                            <span>Paid</span>
+                            <span>Remaining</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-primary to-accent h-2 rounded-full" style="width: {{ (plan.emi_paid / plan.emi_total) * 100 }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="col-span-1 md:col-span-2 p-8 text-center text-gray-500 bg-gray-50 dark:bg-[#121216] rounded-2xl border border-gray-200 dark:border-gray-800">
+                        No active EMI plans
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content absolute top-0 left-0 w-full opacity-0 pointer-events-none">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-1 space-y-6">
+                        <!-- Profile Card -->
+                        <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800 text-center flex flex-col items-center">
+                            <div class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-3xl text-primary font-bold mb-4">
+                                {{ user.name[:1] if user.name else 'U' }}
+                            </div>
+                            
+                            <div class="w-full relative group">
+                                <input type="text" id="profile-name" value="{{ user.name }}" class="text-center font-bold text-xl bg-transparent border-b-2 border-transparent focus:border-primary focus:outline-none w-full transition-colors pb-1">
+                                <button id="btn-save-name" class="hidden absolute right-0 top-1/2 -translate-y-1/2 text-sm bg-primary text-white px-3 py-1 rounded-full">Save</button>
+                            </div>
+                            <div class="text-gray-500 dark:text-gray-400 mt-2">{{ user.phone or '+91 98765 43210' }}</div>
+                        </div>
+                        
+                        <a href="/logout" class="block w-full py-3 rounded-xl border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-medium text-center hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+                            Logout
+                        </a>
+                    </div>
+                    
+                    <div class="md:col-span-2 space-y-6">
+                        <!-- Documents -->
+                        <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+                            <h3 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">Verified Documents</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">Aadhaar Card</div>
+                                            <div class="text-sm text-gray-500">{{ user.aadhaar_number or 'XXXXXXXX1234' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full font-medium">Verified</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">PAN Card</div>
+                                            <div class="text-sm text-gray-500">{{ user.pan_number or 'ABCDEXXXXF' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full font-medium">Verified</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Address -->
+                        <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+                            <h3 class="text-lg font-semibold mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">Delivery Address</h3>
+                            <p class="text-gray-600 dark:text-gray-300">
+                                {% if address %}{{ address.apartment + ', ' if address.apartment else '' }}{{ address.line1 }}{% if address.line2 %}, {{ address.line2 }}{% endif %}, {{ address.city }}, {{ address.state }} {{ address.pincode }}{% else %}Your delivery address will appear here once confirmed.{% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Manage Card & Security (in Profile) -->
+                        <div class="bg-gray-50 dark:bg-[#121216] rounded-2xl p-6 border border-gray-200 dark:border-gray-800">
+                            <div class="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+                                <h3 class="text-lg font-semibold">Manage Card & Security</h3>
+                                <span id="profile-card-badge" class="px-3 py-1 text-xs rounded-full font-medium font-mono {% if card.status == 'blocked' %}bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400{% elif card.status == 'frozen' %}bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400{% else %}bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400{% endif %}">
+                                    {{ card.status|capitalize }}
+                                </span>
+                            </div>
+
+                            <p class="text-sm text-gray-500 mb-6">Control your Express {{ card.card_type }} card controls, lock/freeze transactions, or report lost/stolen card.</p>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <button type="button" onclick="openManageCardModal()" class="py-3 px-4 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                    Manage Card Options
+                                </button>
+                                <button type="button" onclick="triggerQuickFreeze()" id="btn-quick-freeze" class="py-3 px-4 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                    <span id="quick-freeze-text">{% if card.status == 'frozen' %}Enable Card{% else %}Disable / Freeze Card{% endif %}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ════════════ MANAGE CARD MODAL ════════════ -->
+<div id="manage-card-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+    <div id="manage-card-modal" class="bg-white dark:bg-[#121216] w-full max-w-lg rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl scale-95 transition-all duration-300 p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold font-serif italic text-primary">Manage Express Card</h2>
+                <p class="text-xs text-gray-500 font-mono mt-0.5">Card ending in •••• {{ card.last4 }}</p>
+            </div>
+            <button onclick="closeManageCardModal()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <!-- Live Status Alert -->
+        <div id="modal-status-alert" class="rounded-2xl p-4 mb-6 flex items-center justify-between {% if card.status == 'blocked' %}bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800{% elif card.status == 'frozen' %}bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800{% else %}bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800{% endif %}">
+            <div class="flex items-center gap-3">
+                <span id="modal-status-dot" class="w-3 h-3 rounded-full {% if card.status == 'blocked' %}bg-red-500{% elif card.status == 'frozen' %}bg-amber-500 animate-pulse{% else %}bg-green-500{% endif %}"></span>
+                <div>
+                    <h4 id="modal-status-title" class="text-sm font-bold {% if card.status == 'blocked' %}text-red-900 dark:text-red-300{% elif card.status == 'frozen' %}text-amber-900 dark:text-amber-300{% else %}text-green-900 dark:text-green-300{% endif %}">
+                        Card Status: <span class="capitalize" id="modal-status-name">{{ card.status }}</span>
+                    </h4>
+                    <p id="modal-status-desc" class="text-xs {% if card.status == 'blocked' %}text-red-700 dark:text-red-400{% elif card.status == 'frozen' %}text-amber-700 dark:text-amber-400{% else %}text-green-700 dark:text-green-400{% endif %}">
+                        {% if card.status == 'blocked' %}This card is permanently blocked.{% elif card.status == 'frozen' %}Transactions are temporarily paused.{% else %}Your card is active for all transactions.{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Option 1: Temporary Disable / Freeze Card -->
+        <div class="bg-gray-50 dark:bg-[#1a1a22] rounded-2xl p-5 mb-4 border border-gray-200 dark:border-gray-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        Disable / Freeze Card
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-1">Temporarily block all online, swipe, and ATM charges. You can re-enable anytime.</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer ml-3 shrink-0">
+                    <input type="checkbox" id="toggle-freeze-card" class="sr-only peer" {% if card.status == 'frozen' %}checked{% endif %}>
+                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Option 2: Transaction Controls -->
+        <div class="bg-gray-50 dark:bg-[#1a1a22] rounded-2xl p-5 mb-4 border border-gray-200 dark:border-gray-800 space-y-4">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-gray-400">Payment Controls</h3>
+            
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Online Transactions</p>
+                    <p class="text-xs text-gray-500">Domestic e-commerce and app purchases</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer ml-3">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-10 h-5 bg-gray-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Contactless (Tap & Pay)</p>
+                    <p class="text-xs text-gray-500">PIN-less payments up to ₹5,000</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer ml-3">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-10 h-5 bg-gray-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-800 dark:text-gray-200">International Payments</p>
+                    <p class="text-xs text-gray-500">Global merchants and forex spends</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer ml-3">
+                    <input type="checkbox" class="sr-only peer">
+                    <div class="w-10 h-5 bg-gray-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Option 3: Block Card Permanently -->
+        <div class="bg-red-50/50 dark:bg-red-950/20 rounded-2xl p-5 mb-6 border border-red-200 dark:border-red-900/40">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="text-sm font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        Permanently Block Card
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-1">Lost or stolen card? Block immediately to protect your ₹2,00,000 fraud protection warranty and order a free metal replacement.</p>
+                </div>
+                <button type="button" onclick="confirmPermanentBlock()" id="btn-block-permanently" class="shrink-0 py-2 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition-colors">
+                    Block Card
+                </button>
+            </div>
+        </div>
+
+        <button type="button" onclick="closeManageCardModal()" class="w-full py-3.5 rounded-2xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            Close
+        </button>
+    </div>
+</div>
+
+<!-- EMI Modal -->
+<div id="emi-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] opacity-0 pointer-events-none transition-opacity duration-300 flex items-end md:items-center justify-center">
+    <div id="emi-modal" class="bg-white dark:bg-[#121216] w-full md:w-full md:max-w-xl rounded-t-3xl md:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl translate-y-full transition-transform duration-500 ease-out p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold font-serif italic text-primary">Convert to EMI</h2>
+            <button onclick="hideEMIModal()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <div class="text-center mb-6">
+            <p class="text-sm text-gray-500 mb-1">Transaction Amount</p>
+            <div class="text-3xl font-mono font-bold" id="emi-modal-amount">₹0</div>
+        </div>
+        
+        <div class="space-y-4" id="emi-options-container">
+            <!-- Options injected by JS -->
+        </div>
+        
+        <div class="mt-8 flex gap-4">
+            <button onclick="hideEMIModal()" class="flex-1 py-3 rounded-xl border border-gray-300 dark:border-gray-700 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">Cancel</button>
+            <button id="btn-confirm-emi" class="flex-1 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-medium transition-colors shadow-lg shadow-primary/30">Confirm Plan</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Format initial numbers
+        const creditLimitEl = document.getElementById('credit-limit-display');
+        if(creditLimitEl) {
+            let val = creditLimitEl.innerText.replace('₹', '').replace(/,/g, '');
+            creditLimitEl.innerText = '₹' + formatIndianNumber(val);
+        }
+        
+        // Tab Switching Logic
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-target');
+                
+                // Update tabs
+                tabs.forEach(t => {
+                    t.classList.remove('active', 'text-primary', 'border-primary');
+                    t.classList.add('text-gray-500', 'border-transparent');
+                });
+                tab.classList.remove('text-gray-500', 'border-transparent');
+                tab.classList.add('active', 'text-primary', 'border-primary');
+                
+                // Animate contents using GSAP
+                contents.forEach(content => {
+                    if (content.id === target) {
+                        gsap.to(content, { autoAlpha: 1, duration: 0.3, pointerEvents: 'auto', zIndex: 10 });
+                    } else {
+                        gsap.to(content, { autoAlpha: 0, duration: 0.3, pointerEvents: 'none', zIndex: 0 });
+                    }
+                });
+            });
+        });
+
+        // Entrance animations for stat cards
+        if (typeof gsap !== 'undefined') {
+            gsap.from(".stat-cards > div", {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "power2.out"
+            });
+        }
+
+        const cvvToggle = document.getElementById('cvv-toggle');
+        const cvvValue = document.getElementById('cvv-value');
+        if (cvvToggle && cvvValue) {
+            cvvToggle.addEventListener('click', () => {
+                const revealed = cvvValue.textContent === cvvToggle.dataset.cvv;
+                cvvValue.textContent = revealed ? '•••' : cvvToggle.dataset.cvv;
+                cvvToggle.setAttribute('aria-label', revealed ? 'Show CVV' : 'Hide CVV');
+                cvvToggle.querySelector('.sr-only').textContent = revealed ? 'Show CVV' : 'Hide CVV';
+            });
+        }
+
+        // Profile Name Edit
+        const nameInput = document.getElementById('profile-name');
+        const saveBtn = document.getElementById('btn-save-name');
+        
+        if (nameInput) {
+            nameInput.addEventListener('input', () => {
+                saveBtn.classList.remove('hidden');
+                nameInput.classList.add('border-primary');
+            });
+            
+            saveBtn.addEventListener('click', async () => {
+                const newName = nameInput.value;
+                try {
+                    const res = await fetch('/api/update-profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: newName })
+                    });
+                    if (res.ok) {
+                        saveBtn.classList.add('hidden');
+                        nameInput.classList.remove('border-primary');
+                    }
+                } catch (e) {
+                    console.error('Error updating name', e);
+                }
+            });
+        }
+
+        // Limit Increase Logic
+        const btnIncrease = document.getElementById('btn-increase-limit');
+        if (btnIncrease) {
+            btnIncrease.addEventListener('click', async () => {
+                btnIncrease.disabled = true;
+                btnIncrease.innerHTML = '<span class="animate-pulse">Processing...</span>';
+                
+                try {
+                    // Simulated endpoint
+                    const res = await fetch('/api/request-limit-increase', { method: 'POST' });
+                    // Simulate success
+                    setTimeout(() => {
+                        const currentLimitText = creditLimitEl.innerText.replace('₹', '').replace(/,/g, '');
+                        const currentLimit = parseInt(currentLimitText);
+                        const newLimit = currentLimit * 1.1; // 10% increase
+                        
+                        // Animate banner out
+                        if (typeof gsap !== 'undefined') {
+                            gsap.to('#limit-increase-banner', {
+                                height: 0, opacity: 0, margin: 0, padding: 0, duration: 0.5,
+                                onComplete: () => document.getElementById('limit-increase-banner').style.display = 'none'
+                            });
+                        } else {
+                            document.getElementById('limit-increase-banner').style.display = 'none';
+                        }
+                        
+                        // Animate limit up
+                        animateCounter(creditLimitEl, currentLimit, newLimit, 2000);
+                        
+                    }, 800);
+                } catch(e) {
+                    btnIncrease.disabled = false;
+                    btnIncrease.innerText = 'Increase My Limit';
+                }
+            });
+        }
+    });
+
+    // EMI Modal Logic
+    let currentSelectedTransaction = null;
+    let selectedEmiPlan = null;
+
+    window.showEMIModal = function(transactionId, amountStr) {
+        currentSelectedTransaction = transactionId;
+        const amount = parseFloat(amountStr);
+        const modalBackdrop = document.getElementById('emi-modal-backdrop');
+        const modal = document.getElementById('emi-modal');
+        const amountDisplay = document.getElementById('emi-modal-amount');
+        const optionsContainer = document.getElementById('emi-options-container');
+        
+        amountDisplay.innerText = '₹' + formatIndianNumber(amount);
+        
+        // Calculate plans
+        const plan3 = calculateEMI(amount, 1.5, 3);
+        const plan6 = calculateEMI(amount, 0.99, 6);
+        const plan12 = calculateEMI(amount, 1.25, 12);
+        
+        optionsContainer.innerHTML = `
+            <!-- 3 Months -->
+            <label class="block relative cursor-pointer group">
+                <input type="radio" name="emi_plan" value="3" class="peer sr-only" onchange="selectedEmiPlan = 3">
+                <div class="rounded-xl border-2 border-gray-200 dark:border-gray-800 p-4 transition-colors peer-checked:border-secondary peer-checked:bg-secondary/5 hover:border-secondary/50">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="font-bold text-lg">3 Months</div>
+                        <div class="text-sm font-medium">1.5% p.m.</div>
+                    </div>
+                    <div class="flex justify-between items-end text-sm">
+                        <div class="text-gray-500">Total Interest: ₹${formatIndianNumber(plan3.totalInterest)}</div>
+                        <div class="font-bold text-lg text-secondary">₹${formatIndianNumber(plan3.emi)}/mo</div>
+                    </div>
+                </div>
+            </label>
+            
+            <!-- 6 Months (Recommended) -->
+            <label class="block relative cursor-pointer group">
+                <input type="radio" name="emi_plan" value="6" class="peer sr-only" onchange="selectedEmiPlan = 6" checked>
+                <div class="absolute -top-3 right-4 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-sm">Lowest Interest</div>
+                <div class="rounded-xl border-2 border-primary p-4 transition-colors bg-primary/5">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="font-bold text-lg text-primary">6 Months</div>
+                        <div class="text-sm font-medium text-primary">0.99% p.m.</div>
+                    </div>
+                    <div class="flex justify-between items-end text-sm">
+                        <div class="text-gray-600 dark:text-gray-300">Total Interest: ₹${formatIndianNumber(plan6.totalInterest)}</div>
+                        <div class="font-bold text-xl text-primary">₹${formatIndianNumber(plan6.emi)}/mo</div>
+                    </div>
+                </div>
+            </label>
+            
+            <!-- 12 Months -->
+            <label class="block relative cursor-pointer group">
+                <input type="radio" name="emi_plan" value="12" class="peer sr-only" onchange="selectedEmiPlan = 12">
+                <div class="rounded-xl border-2 border-gray-200 dark:border-gray-800 p-4 transition-colors peer-checked:border-secondary peer-checked:bg-secondary/5 hover:border-secondary/50">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="font-bold text-lg">12 Months</div>
+                        <div class="text-sm font-medium">1.25% p.m.</div>
+                    </div>
+                    <div class="flex justify-between items-end text-sm">
+                        <div class="text-gray-500">Total Interest: ₹${formatIndianNumber(plan12.totalInterest)}</div>
+                        <div class="font-bold text-lg text-secondary">₹${formatIndianNumber(plan12.emi)}/mo</div>
+                    </div>
+                </div>
+            </label>
+        `;
+        selectedEmiPlan = 6; // Default checked
+        
+        modalBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+        // Slide up modal
+        setTimeout(() => {
+            modal.classList.remove('translate-y-full');
+        }, 10);
+    };
+
+    window.hideEMIModal = function() {
+        const modalBackdrop = document.getElementById('emi-modal-backdrop');
+        const modal = document.getElementById('emi-modal');
+        
+        modal.classList.add('translate-y-full');
+        setTimeout(() => {
+            modalBackdrop.classList.add('opacity-0', 'pointer-events-none');
+        }, 300);
+        currentSelectedTransaction = null;
+    };
+
+    document.getElementById('btn-confirm-emi')?.addEventListener('click', async () => {
+        if (!currentSelectedTransaction || !selectedEmiPlan) return;
+        
+        const btn = document.getElementById('btn-confirm-emi');
+        const originalText = btn.innerText;
+        btn.innerText = 'Processing...';
+        btn.disabled = true;
+        
+        try {
+            const res = await fetch('/api/convert-to-emi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ transaction_id: currentSelectedTransaction, months: selectedEmiPlan })
+            });
+            
+            // Simulate success
+            setTimeout(() => {
+                hideEMIModal();
+                btn.innerText = originalText;
+                btn.disabled = false;
+                
+                // Update transaction row
+                const td = document.getElementById(`action-td-${currentSelectedTransaction}`);
+                if (td) {
+                    td.innerHTML = `<span class="inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full border border-primary/20">0 of ${selectedEmiPlan} EMIs paid</span>`;
+                }
+            }, 800);
+        } catch(e) {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    });
+
+    // Manage Card Modal Logic
+    window.openManageCardModal = function() {
+        const backdrop = document.getElementById('manage-card-backdrop');
+        const modal = document.getElementById('manage-card-modal');
+        backdrop.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+            modal.classList.remove('scale-95');
+            modal.classList.add('scale-100');
+        }, 10);
+    };
+
+    window.closeManageCardModal = function() {
+        const backdrop = document.getElementById('manage-card-backdrop');
+        const modal = document.getElementById('manage-card-modal');
+        modal.classList.remove('scale-100');
+        modal.classList.add('scale-95');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+        }, 200);
+    };
+
+    // Toggle Freeze / Disable Card
+    const freezeToggle = document.getElementById('toggle-freeze-card');
+    if (freezeToggle) {
+        freezeToggle.addEventListener('change', async (e) => {
+            const isFrozen = e.target.checked;
+            updateCardStatusUI(isFrozen ? 'frozen' : 'active');
+            
+            try {
+                await fetch('/api/freeze-card', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ frozen: isFrozen })
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
+
+    window.triggerQuickFreeze = async function() {
+        if (!freezeToggle) return;
+        freezeToggle.checked = !freezeToggle.checked;
+        freezeToggle.dispatchEvent(new Event('change'));
+    };
+
+    window.confirmPermanentBlock = async function() {
+        if (!confirm('Are you sure you want to permanently block this card? This action cannot be undone. A free replacement metal card will be dispatched to your registered address.')) {
+            return;
+        }
+        
+        const btn = document.getElementById('btn-block-permanently');
+        btn.disabled = true;
+        btn.innerText = 'Blocking...';
+        
+        try {
+            const res = await fetch('/api/block-card', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: 'User requested block via Dashboard' })
+            });
+            const data = await res.json();
+            
+            updateCardStatusUI('blocked');
+            if (freezeToggle) {
+                freezeToggle.checked = true;
+                freezeToggle.disabled = true;
+            }
+            btn.innerText = 'Card Blocked ✓';
+            alert('Your Express card has been permanently blocked. A replacement card is being prepared for dispatch.');
+        } catch(e) {
+            btn.disabled = false;
+            btn.innerText = 'Block Card';
+        }
+    };
+
+    function updateCardStatusUI(status) {
+        const titleEl = document.getElementById('modal-status-name');
+        const descEl = document.getElementById('modal-status-desc');
+        const alertBox = document.getElementById('modal-status-alert');
+        const dot = document.getElementById('modal-status-dot');
+        const profileBadge = document.getElementById('profile-card-badge');
+        const quickText = document.getElementById('quick-freeze-text');
+        
+        if (titleEl) titleEl.innerText = status;
+        if (profileBadge) {
+            profileBadge.innerText = status.charAt(0).toUpperCase() + status.slice(1);
+            profileBadge.className = `px-3 py-1 text-xs rounded-full font-medium font-mono ${
+                status === 'blocked' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                status === 'frozen' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+            }`;
+        }
+        
+        if (quickText) {
+            quickText.innerText = status === 'frozen' ? 'Enable Card' : 'Disable / Freeze Card';
+        }
+
+        if (alertBox && dot && descEl) {
+            if (status === 'blocked') {
+                alertBox.className = 'rounded-2xl p-4 mb-6 flex items-center justify-between bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800';
+                dot.className = 'w-3 h-3 rounded-full bg-red-500';
+                descEl.innerText = 'This card is permanently blocked.';
+            } else if (status === 'frozen') {
+                alertBox.className = 'rounded-2xl p-4 mb-6 flex items-center justify-between bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800';
+                dot.className = 'w-3 h-3 rounded-full bg-amber-500 animate-pulse';
+                descEl.innerText = 'Transactions are temporarily paused.';
+            } else {
+                alertBox.className = 'rounded-2xl p-4 mb-6 flex items-center justify-between bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800';
+                dot.className = 'w-3 h-3 rounded-full bg-green-500';
+                descEl.innerText = 'Your card is active for all transactions.';
+            }
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,882 @@
+/* Express Fintech Platform - Master Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ==========================================================================
+   1. Reset & Base
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg-body: #faf9f7;
+    --bg-section-1: #fbfbfa;
+    --bg-section-2: #f6f3ef;
+    --bg-section-3: #f4f4f2;
+    --text-primary: #0d0d0f;
+    --text-secondary: #3a3a42;
+    --text-tertiary: #55555d;
+    --text-quaternary: #4a4a52;
+    --text-muted: #8a8a92;
+    --border-color: rgba(0, 0, 0, 0.08);
+    --header-bg: rgba(250, 249, 247, 0.85);
+    --card-bg: #ffffff;
+    --feature-bg: linear-gradient(180deg, #fbfbfa 0%, #f6f3ef 100%);
+    --input-bg: #f4f4f2;
+    --color-primary: #e35d12;
+    --color-accent: #c2186f;
+    --color-secondary: #2f6fae;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* ==========================================================================
+   2. Dark Mode (System Preference)
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-body: #0a0a0c;
+        --bg-section-1: #0a0a0c;
+        --bg-section-2: #0d0d10;
+        --bg-section-3: #1a1a20;
+        --text-primary: #ffffff;
+        --text-secondary: #e4e4e7;
+        --text-tertiary: #a1a1aa;
+        --text-quaternary: #d4d4d8;
+        --text-muted: #71717a;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --header-bg: rgba(10, 10, 12, 0.85);
+        --card-bg: #121216;
+        --feature-bg: linear-gradient(180deg, #141418 0%, #1a1a20 100%);
+        --input-bg: #1a1a20;
+    }
+
+    html {
+        color-scheme: dark;
+    }
+
+    body {
+        background-color: var(--bg-body) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .section-1 { background-color: var(--bg-section-1) !important; }
+    .section-2 { background-color: var(--bg-section-2) !important; }
+    .section-3 { background-color: var(--bg-section-3) !important; }
+
+    .text-primary { color: var(--text-primary) !important; }
+    .text-secondary { color: var(--text-secondary) !important; }
+    .text-tertiary { color: var(--text-tertiary) !important; }
+    .text-quaternary { color: var(--text-quaternary) !important; }
+    .text-muted { color: var(--text-muted) !important; }
+
+    header {
+        background-color: var(--header-bg) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+    }
+
+    .text-titanium {
+        background: linear-gradient(90deg, #ffffff, #a1a1aa, #ffffff) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: transparent !important;
+    }
+    
+    .logo-text {
+        background: linear-gradient(90deg, #ffffff, #a1a1aa, #ffffff) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+    
+    .logo-group:hover .logo-text {
+        background: linear-gradient(90deg, var(--color-primary), var(--color-accent)) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+
+    .btn-apply {
+        background: #ffffff !important;
+        color: #0d0d0f !important;
+    }
+    
+    .btn-apply:hover {
+        background: linear-gradient(90deg, var(--color-primary), var(--color-accent)) !important;
+        color: #ffffff !important;
+    }
+
+    .btn-outline {
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #ffffff !important;
+    }
+
+    .btn-outline:hover {
+        background-color: rgba(227, 93, 18, 0.15) !important;
+        color: var(--color-primary) !important;
+    }
+
+    .input-field, .otp-box {
+        background-color: var(--input-bg) !important;
+        color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .card, .panel, #chatbot-window, .stat-card, .profile-dropdown {
+        background-color: var(--card-bg) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .feature-card {
+        background: var(--feature-bg) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .pricing-card {
+        background: var(--feature-bg) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    footer {
+        background-color: #0a0a0c !important;
+        border-top: 1px solid var(--border-color) !important;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #3a3a42 !important;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0a0a0c !important;
+    }
+}
+
+/* ==========================================================================
+   3. Typography
+   ========================================================================== */
+.text-titanium {
+    background: linear-gradient(90deg, #0d0d0f, #3a3a42, #0d0d0f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.display {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   4. Card Gradients
+   ========================================================================== */
+.card-gold {
+    background: linear-gradient(145deg, #e6c456 0%, #c9a02e 12%, #f5d96e 26%, #b8922a 40%, #dab636 52%, #a67c18 64%, #f0d050 78%, #c9a02e 88%, #b8922a 100%);
+}
+
+.card-rosegold {
+    background: linear-gradient(145deg, #e8b4a0 0%, #d4907a 14%, #f0c4b0 26%, #c27e68 40%, #dca494 52%, #b87060 64%, #eebcaa 78%, #d09680 88%, #c07868 100%);
+}
+
+.card-black {
+    background: linear-gradient(145deg, #1a1a1f 0%, #0c0c10 38%, #141419 62%, #08080a 100%);
+}
+
+.card-ultra {
+    background: linear-gradient(145deg, #f0f0f2 0%, #d8d8dc 35%, #eaeaee 55%, #c8c8cc 80%, #e2e2e6 100%);
+}
+
+.card-ultrablue {
+    background: linear-gradient(145deg, #c5ddf0 0%, #8fb8de 30%, #b5d2ea 50%, #7aa8d4 75%, #a8c9e8 100%);
+}
+
+/* Card material, deliberately distinct so the Premium card reads as metal. */
+.express-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+.metal-card { box-shadow: 0 24px 44px -22px rgba(0,0,0,.72), inset 0 1px rgba(255,255,255,.7); }
+.metal-card::after { background: linear-gradient(115deg, rgba(255,255,255,.42), transparent 18%, transparent 68%, rgba(255,255,255,.2)); mix-blend-mode: soft-light; }
+.plastic-card { box-shadow: 0 18px 30px -20px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.45); }
+
+@media (max-width: 640px) {
+    html { -webkit-text-size-adjust: 100%; }
+    body { overflow-x: hidden; }
+    .max-w-6xl, .max-w-7xl { padding-left: 1rem !important; padding-right: 1rem !important; }
+    .text-5xl { font-size: 2.5rem; }
+    .text-4xl { font-size: 2.15rem; }
+    input, select, button { max-width: 100%; }
+    .tab-container { gap: 1.25rem; }
+    .express-card { max-width: 100%; }
+    #chatbot-fab { right: 16px; bottom: 16px; }
+    #chatbot-window { right: 16px; bottom: 84px; width: calc(100vw - 32px); }
+    #steps-container .verification-panel { padding: 1.25rem; border-radius: 1.25rem; }
+    #steps-container input { min-width: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+/* ==========================================================================
+   5. Logo & Nav
+   ========================================================================== */
+.logo-group {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    cursor: pointer;
+    position: relative;
+}
+
+.logo-text {
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #0d0d0f, #3a3a42, #0d0d0f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-group:hover .logo-text {
+    letter-spacing: 0.06em;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-accent {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-group:hover .logo-accent {
+    transform: rotate(90deg) scale(1.2);
+}
+
+.logo-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(227,93,18,0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.logo-group:hover .logo-glow {
+    opacity: 1;
+}
+
+.nav-link {
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    padding-bottom: 2px;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* ==========================================================================
+   6. Buttons
+   ========================================================================== */
+.btn-apply {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: var(--text-primary);
+    color: var(--bg-body);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-apply:hover {
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(227, 93, 18, 0.3);
+    color: white;
+}
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--text-primary);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background-color: rgba(227, 93, 18, 0.05);
+    border-color: rgba(227, 93, 18, 0.3);
+    color: var(--color-primary);
+}
+
+.btn-secondary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 9999px;
+    background-color: var(--input-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+/* ==========================================================================
+   7. Form Inputs
+   ========================================================================== */
+.input-field {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(227, 93, 18, 0.2);
+}
+
+.otp-box {
+    width: 56px;
+    height: 56px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.otp-box:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(227, 93, 18, 0.2);
+}
+
+/* ==========================================================================
+   8. Page Transitions
+   ========================================================================== */
+.page-enter {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(4px);
+}
+
+.page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+}
+
+.page-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.page-exit-active {
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* ==========================================================================
+   9. Step Transitions
+   ========================================================================== */
+.step {
+    opacity: 0;
+    transform: translateX(60px);
+    display: none;
+}
+
+.step.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.step.exit-left {
+    transform: translateX(-60px);
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* ==========================================================================
+   10. Feature Card Hover
+   ========================================================================== */
+.feature-card {
+    background: var(--feature-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   11. Color Selector
+   ========================================================================== */
+.color-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.color-btn.active {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    transform: scale(1.15);
+}
+
+/* ==========================================================================
+   12. Animations
+   ========================================================================== */
+@keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2.8); opacity: 0; }
+}
+
+@keyframes float-up {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+@keyframes envelope-open {
+    0% { transform: rotateX(0deg); z-index: 2; }
+    100% { transform: rotateX(180deg); z-index: 0; }
+}
+
+.text-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(4px);
+}
+
+.text-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pricing-item {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* ==========================================================================
+   13. Mailbox/Envelope Animation
+   ========================================================================== */
+.envelope-container {
+    perspective: 1000px;
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.envelope {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background-color: var(--input-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.envelope .flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 125px;
+    background-color: var(--bg-section-2);
+    clip-path: polygon(0 0, 50% 100%, 100% 0);
+    transform-origin: top;
+    transition: transform 0.6s ease;
+    border: 1px solid var(--border-color);
+}
+
+.envelope.open .flap {
+    transform: rotateX(180deg);
+}
+
+.card-rising {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    width: 80%;
+    height: 200px;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.envelope.open .card-rising {
+    transform: translateX(-50%) translateY(-60px);
+}
+
+/* ==========================================================================
+   14. Scrollbar
+   ========================================================================== */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d4d4d8;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
+}
+
+/* ==========================================================================
+   15. Noise Overlay
+   ========================================================================== */
+.noise {
+    position: relative;
+}
+.noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 50;
+}
+
+.noise-dark::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* ==========================================================================
+   16. Loading & Verification States
+   ========================================================================== */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spinner 1s linear infinite;
+}
+
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+.verification-success {
+    animation: scale-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes scale-bounce {
+    0% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--input-bg) 25%, var(--border-color) 50%, var(--input-bg) 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: 8px;
+}
+
+/* ==========================================================================
+   17. Dashboard
+   ========================================================================== */
+.stat-card {
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    background: var(--card-bg);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.transaction-row {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    transition: background-color 0.2s ease;
+}
+
+.transaction-row:last-child {
+    border-bottom: none;
+}
+
+.transaction-row:hover {
+    background-color: var(--bg-section-1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 -1rem;
+}
+
+.emi-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: rgba(227, 93, 18, 0.1);
+    color: var(--color-primary);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: var(--input-bg);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    border-radius: 9999px;
+    width: 0;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   18. Chatbot
+   ========================================================================== */
+#chatbot-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(227, 93, 18, 0.3);
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+#chatbot-fab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    border: 2px solid var(--color-primary);
+    animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+#chatbot-fab:hover {
+    transform: scale(1.05);
+}
+
+#chatbot-window {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    width: 360px;
+    height: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    z-index: 99;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#chatbot-window.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   19. Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .display {
+        font-size: 2.5rem !important;
+    }
+
+    .btn-apply, .btn-outline {
+        width: 100%;
+    }
+
+    #chatbot-window {
+        width: calc(100% - 2rem);
+        height: 60vh;
+        bottom: 5rem;
+        right: 1rem;
+        left: 1rem;
+    }
+
+    #chatbot-fab {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+/* ==========================================================================
+   20. Welcome Screen
+   ========================================================================== */
+.welcome-screen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, var(--bg-section-2) 0%, var(--bg-body) 100%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-logo {
+    transform: scale(0.5);
+    opacity: 0;
+    animation: welcome-logo-anim 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes welcome-logo-anim {
+    to { transform: scale(1); opacity: 1; }
+}
+
+.welcome-text span {
+    opacity: 0;
+    transform: translateY(10px);
+    display: inline-block;
+}
+
+/* ==========================================================================
+   21. Profile Dropdown
+   ========================================================================== */
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 240px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 50;
+    overflow: hidden;
+}
+
+.profile-dropdown.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}

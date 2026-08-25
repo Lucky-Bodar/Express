@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Waitlist | EXPRESS{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        background-color: #0a0a0c !important;
+        color: #ffffff !important;
+        overflow-x: hidden;
+    }
+    .cred-glow-card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    }
+    .pulse-glow {
+        box-shadow: 0 0 25px rgba(227, 93, 18, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main class="flex-1 flex flex-col items-center justify-center bg-[#0a0a0c] min-h-screen text-center overflow-hidden relative px-4 py-12 select-none">
+    
+    <!-- Ambient luxury radial glow -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div class="w-[320px] sm:w-[600px] h-[320px] sm:h-[600px] rounded-full bg-[#e35d12]/[0.05] blur-[140px]"></div>
+    </div>
+    
+    <!-- Top left logo -->
+    <div class="absolute top-6 sm:top-8 left-6 sm:left-8 z-20">
+        <a href="/" class="text-xl font-display italic text-white/90 hover:text-white tracking-widest transition-colors flex items-center gap-2">
+            <span>EXPRESS</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#e35d12]"></span>
+        </a>
+    </div>
+    
+    <div id="waitlist-content" class="z-10 w-full max-w-lg px-2 sm:px-6 flex flex-col items-center opacity-0 translate-y-6 transition-all duration-700">
+        
+        <!-- CRED-style status icon -->
+        <div class="w-16 h-16 sm:w-20 sm:h-20 mb-8 rounded-full border border-white/10 flex items-center justify-center bg-white/[0.02] shadow-2xl relative">
+            <div class="absolute inset-0 rounded-full border border-[#e35d12]/30 animate-ping opacity-40"></div>
+            <svg class="w-7 h-7 sm:w-8 sm:h-8 text-[#e35d12]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+
+        <p class="text-[10px] tracking-[0.32em] uppercase text-[#e35d12] mb-3 font-mono">Curated Onboarding</p>
+        <h1 class="text-4xl sm:text-6xl font-display italic text-white mb-4 tracking-tight leading-tight">
+            you’re on the<br>waitlist.
+        </h1>
+        
+        <p class="text-gray-400 max-w-md mb-8 text-sm sm:text-base leading-relaxed tracking-wide font-light">
+            Express membership is currently open to members aged 21 and above. Your position is reserved and we're onboarding members in exclusive batches.
+        </p>
+        
+        <!-- CRED Queue Position Card -->
+        <div class="w-full cred-glow-card rounded-3xl p-6 sm:p-8 text-left mb-8 transition-all hover:border-white/20">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-mono">Your Queue Priority</p>
+                </div>
+                <span class="text-[10px] uppercase font-mono px-3 py-1 rounded-full bg-[#e35d12]/20 text-[#e35d12] border border-[#e35d12]/30">Active Batch</span>
+            </div>
+            
+            <p class="text-4xl sm:text-5xl font-light text-white tracking-widest font-mono mb-4" id="queue-number">
+                #2,841
+            </p>
+            
+            <!-- Progress bar -->
+            <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-4">
+                <div class="h-full bg-gradient-to-r from-[#e35d12] to-amber-400 rounded-full w-[68%]"></div>
+            </div>
+            
+            <div class="flex justify-between items-center text-xs text-gray-400 font-mono">
+                <span>Batch #04</span>
+                <span class="text-white">68% of invites claimed</span>
+            </div>
+        </div>
+
+        <!-- Perks preview -->
+        <div class="grid grid-cols-3 gap-3 w-full mb-8">
+            <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:p-4 text-center">
+                <p class="text-xs sm:text-sm font-semibold text-white mb-0.5">0.99%</p>
+                <p class="text-[9px] text-gray-500 uppercase tracking-wider font-mono">Lowest Rates</p>
+            </div>
+            <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:p-4 text-center">
+                <p class="text-xs sm:text-sm font-semibold text-white mb-0.5">Metal Card</p>
+                <p class="text-[9px] text-gray-500 uppercase tracking-wider font-mono">Gold & Black</p>
+            </div>
+            <div class="bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:p-4 text-center">
+                <p class="text-xs sm:text-sm font-semibold text-white mb-0.5">15% Off</p>
+                <p class="text-[9px] text-gray-500 uppercase tracking-wider font-mono">Luxury Dining</p>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
+            <a href="/login" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-gray-100 transition-colors">
+                Check Another Number
+            </a>
+            <a href="/" class="w-full sm:w-auto px-8 py-3.5 rounded-full border border-white/20 text-white font-medium text-sm hover:bg-white/5 transition-colors">
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Generate a smooth randomized queue position
+        const baseQueue = Math.floor(Math.random() * 800) + 1200;
+        document.getElementById('queue-number').innerText = `#${baseQueue.toLocaleString()}`;
+
+        // Entrance transition
+        setTimeout(() => {
+            const content = document.getElementById('waitlist-content');
+            content.classList.remove('opacity-0', 'translate-y-6');
+            content.classList.add('opacity-100', 'translate-y-0');
+        }, 150);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full antialiased scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EXPRESS — I Am Worth It</title>
+  <meta name="color-scheme" content="light" />
+  
+  <meta name="description" content="The premium metal credit card with unbeatable interest rates. 15% dining discounts, lounge access, cashback & more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Instrument Serif', 'Georgia', 'serif'],
+          },
+        },
+      },
+    }
+
+    // -- Chatbot --
+    function toggleChatbot() {
+      document.getElementById('chatbot-window').classList.toggle('open');
+      var input = document.getElementById('chatbot-input');
+      if (document.getElementById('chatbot-window').classList.contains('open')) {
+        setTimeout(function() { input.focus(); }, 300);
+      }
+    }
+
+    var botResponses = {
+      'check my balance': 'Your current outstanding is Rs 12,450. Available credit limit: Rs 2,87,550. Payment due: Aug 28.',
+      'convert to emi': 'Your last purchase of Rs 24,999 can be converted to 6 EMIs at 0.99% p.m. First EMI: Sept 1. Shall I proceed?',
+      'block my card': 'I can block your card ending in 7163 immediately. This is irreversible until a replacement is issued. Confirm to proceed.',
+    };
+    var defaultReply = 'I understand your query. Let me connect you with the right information. Is there anything specific about your Express card I can help with?';
+
+    function addMsg(text, isUser) {
+      var msgs = document.getElementById('chatbot-msgs');
+      var wrapper = document.createElement('div');
+      wrapper.className = 'flex ' + (isUser ? 'justify-end' : 'justify-start');
+      wrapper.style.opacity = '0';
+      wrapper.style.transform = 'translateY(8px)';
+      var bubble = document.createElement('div');
+      bubble.className = isUser
+        ? 'rounded-2xl rounded-tr-sm bg-[#0d0d0f] px-4 py-3 text-[13px] leading-relaxed text-white max-w-[85%]'
+        : 'rounded-2xl rounded-tl-sm bg-white border border-black/[0.06] shadow-sm px-4 py-3 text-[13px] leading-relaxed text-[#3a3a42] max-w-[85%]';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      msgs.appendChild(wrapper);
+      msgs.scrollTop = msgs.scrollHeight;
+      requestAnimationFrame(function() {
+        wrapper.style.transition = 'all 0.3s ease';
+        wrapper.style.opacity = '1';
+        wrapper.style.transform = 'translateY(0)';
+      });
+    }
+
+    function sendQuickMsg(btn) {
+      var text = btn.textContent.trim();
+      addMsg(text, true);
+      var quickBtns = document.getElementById('quick-btns');
+      if (quickBtns) quickBtns.remove();
+      var key = text.toLowerCase();
+      setTimeout(function() {
+        addMsg(botResponses[key] || defaultReply, false);
+      }, 600);
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      var input = document.getElementById('chatbot-input');
+      var text = input.value.trim();
+      if (!text) return;
+      addMsg(text, true);
+      input.value = '';
+      var key = text.toLowerCase();
+      setTimeout(function() {
+        addMsg(botResponses[key] || defaultReply, false);
+      }, 600);
+    }
+
+    // -- Mouse Follow Glow on Hero --
+    var heroWrap = document.querySelector('.hero-wrap');
+    var glowCursor = document.getElementById('glow-cursor');
+    if (heroWrap && glowCursor) {
+      heroWrap.style.cursor = 'default';
+      heroWrap.addEventListener('mousemove', function(e) {
+        var rect = heroWrap.getBoundingClientRect();
+        var x = e.clientX - rect.left - 250;
+        var y = e.clientY - rect.top - 250;
+        glowCursor.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      });
+      heroWrap.addEventListener('mouseleave', function() {
+        glowCursor.style.opacity = '0';
+      });
+      heroWrap.addEventListener('mouseenter', function() {
+        glowCursor.style.opacity = '1';
+      });
+    }
+
+    // -- Theme Toggle --
+    function updateThemeIcons() {
+      var sun = document.getElementById('theme-icon-sun');
+      var moon = document.getElementById('theme-icon-moon');
+      if (!sun || !moon) return;
+      if (document.documentElement.classList.contains('dark')) {
+        sun.classList.remove('hidden');
+        moon.classList.add('hidden');
+      } else {
+        sun.classList.add('hidden');
+        moon.classList.remove('hidden');
+      }
+    }
+    
+    // Initialize icons as soon as possible
+    document.addEventListener('DOMContentLoaded', updateThemeIcons);
+    // Also run immediately in case DOM is already parsed
+    updateThemeIcons();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .dot-mesh {
+      background-image: radial-gradient(circle, rgba(13,13,15,0.06) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .noise::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.35;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 180px;
+      mix-blend-mode: multiply;
+    }
+    .noise-xxxx::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.5;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 180px;
+      mix-blend-mode: overlay;
+    }
+
+    .blueprint-grid {
+      background-image:
+        linear-gradient(rgba(47,111,174,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47,111,174,0.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .text-titanium {
+      background: linear-gradient(180deg, #0d0d0f 0%, #3a3a42 50%, #0d0d0f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .display { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; }
+
+    /* ── Realistic Gold ── */
+    .card-gold {
+      background: linear-gradient(145deg,
+        #e6c456 0%,
+        #c9a02e 12%,
+        #f5d96e 26%,
+        #b8922a 40%,
+        #dab636 52%,
+        #a67c18 64%,
+        #f0d050 78%,
+        #c9a02e 88%,
+        #b8922a 100%
+      );
+    }
+    .card-gold::before {
+      content: '';
+      display: none;
+    }
+
+    /* ── Realistic Rose Gold ── */
+    .card-rosegold {
+      background: linear-gradient(145deg,
+        #e8b4a0 0%,
+        #d4907a 14%,
+        #f0c4b0 26%,
+        #c27e68 40%,
+        #dca494 52%,
+        #b87060 64%,
+        #eebcaa 78%,
+        #d09680 88%,
+        #c07868 100%
+      );
+    }
+    .card-rosegold::before {
+      content: '';
+      display: none;
+    }
+
+    /* ── Matte Black ── */
+    .card-black {
+      background: linear-gradient(145deg, #1a1a1f 0%, #0c0c10 38%, #141419 62%, #08080a 100%);
+    }
+    .card-black::before {
+      content: '';
+      display: none;
+    }
+
+
+    /* -- Ultra Plastic -- */
+    .card-ultra {
+      background: linear-gradient(145deg, #f0f0f2 0%, #d8d8dc 35%, #eaeaee 55%, #c8c8cc 80%, #e2e2e6 100%);
+    }
+    .card-ultra::before {
+      content: '';
+      display: none;
+    }
+
+    /* ── Metal & Plastic Finishes ── */
+    .finish-metal {
+      box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.45), inset 0 1px 1.5px rgba(255, 255, 255, 0.7);
+      position: relative;
+    }
+    .finish-metal::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(125deg, rgba(255,255,255,0.4) 0%, transparent 35%, rgba(255,255,255,0.12) 65%, transparent 100%);
+      pointer-events: none;
+    }
+    .finish-plastic {
+      box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      position: relative;
+    }
+
+    /* -- Floating Chatbot -- */
+    #chatbot-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #0d0d0f, #2a2a34);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px -6px rgba(13,13,15,0.35), 0 0 0 1px rgba(255,255,255,0.06) inset;
+      cursor: pointer;
+      z-index: 100;
+      transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    #chatbot-fab:hover {
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 0 16px 40px -8px rgba(227,93,18,0.3), 0 0 0 1px rgba(255,255,255,0.08) inset;
+      background: linear-gradient(135deg, #e35d12, #c2186f);
+    }
+    #chatbot-fab .fab-pulse {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(227,93,18,0.4);
+      animation: pulse-ring 2.5s cubic-bezier(0.4,0,0.2,1) infinite;
+    }
+    #chatbot-window {
+      position: fixed;
+      bottom: 96px;
+      right: 28px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      height: 480px;
+      max-height: calc(100vh - 120px);
+      background: #ffffff;
+      border-radius: 24px;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 32px 80px -16px rgba(13,13,15,0.22), 0 0 0 1px rgba(0,0,0,0.04);
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px) scale(0.96);
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    #chatbot-window.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+
+    /* -- Mouse Follow Glow (Hero Only) -- */
+    #hero-glow {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    #hero-glow .glow-orb {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+      mix-blend-mode: normal;
+    }
+    #hero-glow .glow-cursor {
+      background: radial-gradient(circle, rgba(227,93,18,0.12) 0%, rgba(194,24,111,0.06) 40%, transparent 70%);
+      width: 500px;
+      height: 500px;
+      transition: transform 0.15s ease-out, opacity 0.5s ease;
+    }
+    .hero-wrap:hover #hero-glow .glow-orb { opacity: 1; }
+    .hero-wrap:hover #hero-glow .glow-cursor { opacity: 1; }
+
+    /* Corner glows */
+    #hero-glow .glow-tl {
+      top: -200px; left: -200px;
+      background: radial-gradient(circle, rgba(227,93,18,0.08) 0%, transparent 70%);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    #hero-glow .glow-tr {
+      top: -200px; right: -200px;
+      background: radial-gradient(circle, rgba(194,24,111,0.07) 0%, transparent 70%);
+      transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+    }
+    #hero-glow .glow-bl {
+      bottom: -200px; left: -200px;
+      background: radial-gradient(circle, rgba(47,111,174,0.07) 0%, transparent 70%);
+      transition: opacity 0.8s ease 0.15s, transform 0.8s ease 0.15s;
+    }
+    #hero-glow .glow-br {
+      bottom: -200px; right: -200px;
+      background: radial-gradient(circle, rgba(227,93,18,0.06) 0%, transparent 70%);
+      transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+    }
+    .hero-wrap:hover #hero-glow .glow-tl { transform: translate(60px, 60px); }
+    .hero-wrap:hover #hero-glow .glow-tr { transform: translate(-60px, 60px); }
+    .hero-wrap:hover #hero-glow .glow-bl { transform: translate(60px, -60px); }
+    .hero-wrap:hover #hero-glow .glow-br { transform: translate(-60px, -60px); }
+
+
+    /* -- Ultra Sky Blue -- */
+    .card-ultrablue {
+      background: linear-gradient(145deg, #c5ddf0 0%, #8fb8de 30%, #b5d2ea 50%, #7aa8d4 75%, #a8c9e8 100%);
+    }
+    .card-ultrablue::before {
+      content: '';
+      display: none;
+    }
+
+    /* ── Orbits ── */
+    @keyframes orbit-cw {
+      from { transform: rotate(var(--start-angle)); }
+      to   { transform: rotate(calc(var(--start-angle) + 360deg)); }
+    }
+    @keyframes orbit-ccw {
+      from { transform: rotate(var(--start-angle)); }
+      to   { transform: rotate(calc(var(--start-angle) - 360deg)); }
+    }
+    @keyframes counter-cw {
+      from { transform: rotate(var(--counter-offset, 0deg)); }
+      to   { transform: rotate(calc(var(--counter-offset, 0deg) - 360deg)); }
+    }
+    @keyframes counter-ccw {
+      from { transform: rotate(var(--counter-offset, 0deg)); }
+      to   { transform: rotate(calc(var(--counter-offset, 0deg) + 360deg)); }
+    }
+    @keyframes pulse-ring {
+      0%   { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+
+    /* ── Logo Hover ── */
+    .logo-group {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      position: relative;
+      cursor: pointer;
+    }
+    .logo-text {
+      font-size: 1.15em;
+      font-weight: 700;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #0d0d0f 0%, #3a3a42 50%, #0d0d0f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .logo-group:hover .logo-text {
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, #e35d12 0%, #c2186f 50%, #e35d12 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .logo-accent {
+      width: 0.72em;
+      height: 0.72em;
+      transform: translateY(-0.32em);
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .logo-group:hover .logo-accent {
+      transform: translateY(-0.32em) rotate(90deg) scale(1.2);
+    }
+    .logo-glow {
+      position: absolute;
+      inset: -8px -12px;
+      background: radial-gradient(ellipse, rgba(227,93,18,0.12), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      border-radius: 20px;
+    }
+    .logo-group:hover .logo-glow { opacity: 1; }
+
+    /* ── Nav Link Hover ── */
+    .nav-link {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 2px;
+      overflow: hidden;
+      transition: color 0.35s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1.5px;
+      background: linear-gradient(90deg, #e35d12, #c2186f);
+      transform: translateX(-101%);
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .nav-link:hover { color: #0d0d0f; }
+    .nav-link:hover::after { transform: translateX(0); }
+
+    /* ── Apply Now Button ── */
+    .btn-apply {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 9999px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      background: #0d0d0f;
+      color: #fbfbfa;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .btn-apply::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #e35d12, #c2186f, #2f6fae);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .btn-apply:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px -8px rgba(227, 93, 18, 0.35), 0 4px 12px -4px rgba(13,13,15,0.2);
+      letter-spacing: 0.18em;
+    }
+    .btn-apply:hover::before { opacity: 1; }
+    .btn-apply span { position: relative; z-index: 1; display: flex; align-items: center; gap: 8px; }
+
+    /* ── Outline Button ── */
+    .btn-outline {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.02);
+      color: #0d0d0f;
+      backdrop-filter: blur(12px);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .btn-outline:hover {
+      border-color: rgba(227,93,18,0.3);
+      background: rgba(227,93,18,0.04);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px -8px rgba(227,93,18,0.15);
+    }
+
+    /* ── Color Selector ── */
+    .color-btn { transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .color-btn.active {
+      outline: 2px solid #e35d12;
+      outline-offset: 4px;
+      transform: scale(1.15);
+    }
+    .color-btn:hover:not(.active) { transform: scale(1.1); }
+
+    /* ── Feature Card Hover ── */
+    .feature-card {
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 32px 80px -24px rgba(13,13,15,0.15), inset 0 1px 0 0 rgba(255,255,255,0.9);
+    }
+
+
+    /* -- Aesthetic Background -- */
+    body.elegant-bg {
+      background-color: #faf9f7 !important;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(227,93,18,0.045) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(194,24,111,0.035) 0px, transparent 50%),
+        radial-gradient(at 80% 100%, rgba(47,111,174,0.04) 0px, transparent 50%),
+        radial-gradient(at 20% 80%, rgba(227,93,18,0.03) 0px, transparent 50%) !important;
+      background-attachment: fixed !important;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+
+    /* ── Smooth text reveal ── */
+    .text-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      filter: blur(4px);
+    }
+    .text-reveal.revealed {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ── Pricing list item stagger ── */
+    .pricing-item {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* ── Dark Theme Overrides ── */
+    html.dark body.elegant-bg {
+      background-color: #0a0a0c !important;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(227,93,18,0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(194,24,111,0.08) 0px, transparent 50%),
+        radial-gradient(at 80% 100%, rgba(47,111,174,0.1) 0px, transparent 50%),
+        radial-gradient(at 20% 80%, rgba(227,93,18,0.08) 0px, transparent 50%) !important;
+    }
+    html.dark .bg-\[\#fbfbfa\],
+    html.dark .bg-\[\#f6f3ef\],
+    html.dark .bg-\[\#fafafa\],
+    html.dark .bg-white { background-color: #0a0a0c !important; }
+    html.dark .bg-\[\#f6f6f4\] { background-color: #121216 !important; background-image: none !important; }
+    html.dark .bg-\[\#f4f4f2\] { background-color: #1a1a20 !important; }
+    html.dark .text-\[\#0d0d0f\],
+    html.dark .text-\[\#3a3a42\] { color: #ffffff !important; }
+    html.dark .text-\[\#55555d\] { color: #a1a1aa !important; }
+    html.dark .text-\[\#4a4a52\] { color: #d4d4d8 !important; }
+    html.dark .text-\[\#8a8a92\] { color: #71717a !important; }
+    html.dark .text-titanium {
+      background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 50%, #ffffff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    html.dark .border-black\/\[0\.06\],
+    html.dark .border-black\/\[0\.07\],
+    html.dark .border-black\/\[0\.08\],
+    html.dark .border-black\/\[0\.09\],
+    html.dark .border-black\/10,
+    html.dark .border-black\/5 { border-color: rgba(255,255,255,0.08) !important; }
+    html.dark .btn-outline {
+      border-color: rgba(255,255,255,0.15) !important;
+      background: rgba(255,255,255,0.05) !important;
+      color: #ffffff !important;
+    }
+    html.dark .logo-text {
+      background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 50%, #ffffff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    html.dark header .bg-\[\#fbfbfa\]\/80 { background-color: rgba(10,10,12,0.8) !important; }
+    html.dark .noise::after { opacity: 0.08 !important; }
+    html.dark .noise-xxxx::after { opacity: 0.15 !important; }
+    html.dark .btn-apply { background: #fbfbfa !important; color: #0d0d0f !important; }
+    html.dark .btn-apply::before { background: linear-gradient(135deg, #e35d12, #c2186f) !important; }
+    html.dark .btn-apply:hover { color: #fbfbfa !important; }
+    html.dark #chatbot-window { background: #121216 !important; border-color: rgba(255,255,255,0.1) !important; }
+    html.dark #chatbot-msgs { background: linear-gradient(180deg, #121216 0%, #0a0a0c 100%) !important; }
+    html.dark #chatbot-msgs > div > div.bg-white { background-color: #1a1a20 !important; border-color: rgba(255,255,255,0.08) !important; color: #d4d4d8 !important; }
+    html.dark #chatbot-msgs button { background-color: #1a1a20 !important; border-color: rgba(255,255,255,0.08) !important; color: #a1a1aa !important; }
+    html.dark #chatbot-window .bg-\[\#fafafa\] { background-color: #121216 !important; }
+    html.dark #chatbot-input { background-color: #1a1a20 !important; color: #ffffff !important; }
+    html.dark #chatbot-input::placeholder { color: #71717a !important; }
+
+  </style>
+</head>
+
+<body class="flex min-h-full flex-col elegant-bg font-sans">
+
+  <!-- ═══ HEADER ═══ -->
+  <header id="site-header" class="sticky top-0 z-50 w-full" style="opacity:0; transform:translateY(-80px)">
+    <div class="border-b border-black/[0.06] bg-[#fbfbfa]/80 backdrop-blur-xl">
+      <nav class="flex h-16 w-full items-center justify-between px-6 sm:px-10">
+        <!-- Elegant Logo -->
+        <a href="#top" class="logo-group">
+          <span class="logo-glow"></span>
+          <span class="logo-text">EXPRESS</span>
+          <svg viewBox="0 0 24 24" class="logo-accent" fill="none" stroke="#e35d12" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 13a10 10 0 0 1 10-10"></path>
+            <path d="M6.5 17a6.5 6.5 0 0 1 6.5-6.5" opacity="0.75"></path>
+            <path d="M9 21a3 3 0 0 1 3-3" opacity="0.5"></path>
+          </svg>
+        </a>
+        <!-- Nav Links with hover animation -->
+        <div class="hidden items-center gap-9 md:flex">
+          <a href="#features" class="nav-link text-[12px] uppercase tracking-[0.18em] text-[#55555d]">Features</a>
+          <a href="#the-card" class="nav-link text-[12px] uppercase tracking-[0.18em] text-[#55555d]">The Card</a>
+          <a href="/apply" class="nav-link text-[12px] uppercase tracking-[0.18em] text-[#55555d]">Pricing</a>
+          <a href="#support" class="nav-link text-[12px] uppercase tracking-[0.18em] text-[#55555d]">Support</a>
+        </div>
+        <!-- Theme Toggle & Apply Now -->
+        
+        <!-- Profile Dropdown & Apply -->
+        <div class="flex items-center gap-3 sm:gap-4">
+          <a href="/apply" class="btn-apply px-5 py-2.5 text-[11px]"><span>Apply Now</span></a>
+          <div class="relative">
+          <button id="profile-toggle" class="w-9 h-9 rounded-full bg-[#e35d12]/10 flex items-center justify-center text-[#e35d12] hover:bg-[#e35d12] hover:text-white transition-colors cursor-pointer border border-[#e35d12]/20">
+                {% if user and user.name %}
+                    <span class="font-bold text-sm leading-none">{{ user.name[0]|upper }}</span>
+                {% else %}
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                {% endif %}
+          </button>
+          
+          <!-- Dropdown Menu (click-based) -->
+          <div id="profile-dropdown" class="absolute right-0 top-12 w-64 bg-white border border-black/10 rounded-2xl shadow-xl py-4 z-[100] hidden">
+                {% if user %}
+                <div class="px-6 mb-4 border-b border-black/10 pb-4">
+                    <p class="font-bold text-black truncate">{{ user.name }}</p>
+                    <p class="text-sm text-gray-500 truncate">{{ user.phone }}</p>
+                </div>
+                <div class="flex flex-col">
+                    <a href="/dashboard" class="block px-6 py-2.5 text-gray-600 hover:text-[#e35d12] hover:bg-[#e35d12]/5 transition-colors">Dashboard</a>
+                    {% if not has_card %}
+                    <a href="/apply" class="block px-6 py-2.5 text-gray-600 hover:text-[#e35d12] hover:bg-[#e35d12]/5 transition-colors">Apply for Card</a>
+                    {% endif %}
+                    <a href="/logout" class="block px-6 py-2.5 text-red-500 hover:bg-red-50 transition-colors mt-2">Logout</a>
+                </div>
+                {% else %}
+                <div class="flex flex-col">
+                    <a href="/login" class="block px-6 py-2.5 text-gray-600 hover:text-[#e35d12] hover:bg-[#e35d12]/5 transition-colors">Login</a>
+                </div>
+                {% endif %}
+          </div>
+          </div>
+        </div>
+
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1">
+
+    <!-- ═══ HERO — Text ABOVE Card ═══ -->
+    <div id="top" class="hero-wrap relative">
+        <!-- Mouse Follow Glow Layer -->
+        <div id="hero-glow">
+          <div class="glow-orb glow-tl"></div>
+          <div class="glow-orb glow-tr"></div>
+          <div class="glow-orb glow-bl"></div>
+          <div class="glow-orb glow-br"></div>
+          <div class="glow-orb glow-cursor" id="glow-cursor"></div>
+        </div>
+
+      <section class="relative h-[180vh]">
+        <div class="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden">
+          <!-- Background -->
+          <div aria-hidden="true" class="absolute inset-0">
+            <div class="noise relative size-full overflow-hidden bg-[#f6f3ef]">
+              <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,#fbeee1_0%,#f6f3ef_55%,#efece6_100%)]"></div>
+              <div class="absolute left-1/2 top-1/2 size-[52rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(227,93,18,0.20),transparent_65%)] blur-[70px]"></div>
+              <div class="absolute left-[30%] top-[62%] size-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(13,13,15,0.08),transparent_68%)] blur-[80px]"></div>
+              <div class="absolute left-[72%] top-[32%] size-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(227,93,18,0.12),transparent_70%)] blur-[60px]"></div>
+            </div>
+          </div>
+
+          <!-- Single Line Elegant Title -->
+          <div class="relative z-10 mb-8 sm:mb-12 text-center px-5">
+            <h1 class="display text-[#0d0d0f] text-[12vw] sm:text-[76px] lg:text-[100px] whitespace-nowrap hero-line">I Am Worth It</h1>
+          </div>
+
+          <!-- Hero Card — Normal Expand (not full screen) -->
+          <div id="hero-card" class="relative aspect-[1.586/1] shrink-0 overflow-hidden shadow-[0_50px_110px_-32px_rgba(13,13,15,0.38),0_10px_26px_-12px_rgba(13,13,15,0.18)]" style="width:100%; max-width:min(360px, 85vw); max-height:45vh; border-radius:24px">
+            <div class="size-full card-gold relative">
+              <div class="relative z-[2] flex h-full flex-col justify-between p-7 sm:p-9">
+                <div class="flex items-start justify-between">
+                  <span class="text-[13px] font-semibold italic tracking-tight text-white/80">EXPRESS</span>
+                  
+                </div>
+                <div class="flex items-center">
+                  <div class="w-11 h-8 rounded-[5px] bg-gradient-to-br from-yellow-100/60 to-yellow-500/40 border border-white/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3)]"></div>
+                </div>
+                <div>
+                  <p class="text-[9px] uppercase tracking-[0.34em] text-white/40 mb-2">●●●● ●●●● ●●●● 7163</p>
+                  <div class="flex items-end justify-between">
+                    <div>
+                      <p class="text-[13px] font-medium tracking-[0.18em] text-white/85">{{ user.name|upper if user and user.name else 'EXPRESS MEMBER' }}</p>
+                      <p class="text-[8px] uppercase tracking-[0.3em] text-white/35 mt-0.5">Metal Gold</p>
+                    </div>
+                    <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/25">Contactless</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Prompt -->
+          <div class="relative z-10 mt-8 flex flex-col items-center gap-2">
+            <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-[#4a4a52]">The Express Metal Card</p>
+            <p class="font-mono text-[9px] uppercase tracking-[0.28em] text-[#8a8a92]">Scroll to explore</p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a8a92" stroke-width="1.5" class="mt-1 animate-bounce"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Subtitle ── -->
+      <section class="relative flex min-h-[68vh] items-center justify-center bg-[#fbfbfa] dot-mesh px-5 py-24 sm:px-6 sm:py-32">
+        <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+          <div class="absolute left-1/2 top-[-30%] size-[720px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(242,107,33,0.10),transparent_62%)] blur-[40px]"></div>
+        </div>
+        <div class="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center">
+          <div class="text-reveal">
+            <p class="max-w-xl text-[15px] leading-relaxed text-[#55555d] sm:text-[16.5px]">
+              Premium credit experiences with India's lowest interest rates. Dine, travel, and earn effortlessly.
+              <span class="text-[#0d0d0f] font-medium">Starting at ₹799/year.</span>
+            </p>
+          </div>
+          <div class="mt-9 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center text-reveal">
+            <a href="/apply" class="btn-apply px-6 py-3 text-[13px] w-full sm:w-auto">
+              <span>Apply Now <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+            </a>
+            <a href="#the-card" class="btn-outline px-6 py-3 text-[13px] w-full sm:w-auto">Explore the Card</a>
+          </div>
+          <div class="mt-14 w-full border-t border-black/[0.08] pt-6 sm:mt-16 sm:pt-7 text-reveal">
+            <ul class="grid grid-cols-2 gap-x-4 gap-y-3.5 font-mono text-[9px] uppercase tracking-[0.16em] text-[#8a8a92] sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-7 sm:text-[9.5px] sm:tracking-[0.2em]">
+              <li class="flex items-center justify-center gap-7">Lowest Interest Rates<span aria-hidden="true" class="hidden size-[3px] rounded-full bg-[#d4d4d8] sm:block"></span></li>
+              <li class="flex items-center justify-center gap-7">Lounge Access<span aria-hidden="true" class="hidden size-[3px] rounded-full bg-[#d4d4d8] sm:block"></span></li>
+              <li class="flex items-center justify-center gap-7">From ₹799 / Year<span aria-hidden="true" class="hidden size-[3px] rounded-full bg-[#d4d4d8] sm:block"></span></li>
+              <li class="flex items-center justify-center gap-7">24/7 AI Support</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ═══ THE CARD ═══ -->
+    <section id="the-card" class="relative bg-[#fbfbfa] dot-mesh py-28 sm:py-36">
+      <div class="relative mx-auto w-full max-w-6xl px-6">
+        <div class="mb-20 text-center">
+          <div class="text-reveal"><span class="font-mono text-[10px] uppercase tracking-[0.32em] text-[#e35d12]">Metal & Plastic Finishes</span></div>
+          <div class="text-reveal"><h2 class="text-titanium mx-auto mt-5 max-w-2xl text-[34px] font-normal leading-[1.06] tracking-[-0.02em] sm:text-[52px]">Choose your finish</h2></div>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <div class="card-showcase text-reveal [perspective:1400px]">
+            <div id="showcase-card" class="noise-dark relative aspect-[1.586/1] w-[460px] max-w-[86vw] overflow-hidden rounded-[26px] border border-white/10 shadow-[0_40px_90px_-20px_rgba(0,0,0,0.85),inset_0_1px_0_0_rgba(255,255,255,0.09)] transition-all duration-500" style="transform-style:preserve-3d">
+              <div id="card-bg" class="absolute inset-0 card-gold transition-all duration-700"></div>
+
+              <!-- Chip -->
+              <div class="absolute top-[28%] left-[10%] z-[3] w-11 h-8 rounded-[5px] bg-gradient-to-br from-yellow-100/50 to-yellow-600/30 border border-white/15 shadow-[inset_0_1px_2px_rgba(255,255,255,0.2)]"></div>
+              <div class="absolute top-[28%] left-[22%] z-[3]">
+                <svg viewBox="0 0 24 24" class="size-4 text-white/25 rotate-90" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8.32a7.43 7.43 0 0 1 0 7.36"></path><path d="M9.46 6.21a11.76 11.76 0 0 1 0 11.58"></path><path d="M12.91 4.1a15.91 15.91 0 0 1 .01 15.8"></path></svg>
+              </div>
+              <div class="relative z-[3] flex h-full flex-col justify-between p-6 sm:p-8" style="transform:translateZ(46px)">
+                <div class="flex items-start justify-between">
+                  <span class="text-[13px] font-semibold italic tracking-tight text-white/70">EXPRESS</span>
+                  <svg viewBox="0 0 24 24" class="size-6 text-white/50" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 8.32a7.43 7.43 0 0 1 0 7.36"></path><path d="M9.46 6.21a11.76 11.76 0 0 1 0 11.58"></path><path d="M12.91 4.1a15.91 15.91 0 0 1 .01 15.8"></path><path d="M16.37 2a20.16 20.16 0 0 1 0 20"></path></svg>
+                </div>
+                <div></div>
+                <div>
+                  <p class="text-[9px] uppercase tracking-[0.3em] text-white/25 mb-3">●●●● ●●●● ●●●● 7163</p>
+                  <p class="text-[15px] font-medium tracking-[0.22em] text-white/85 sm:text-[17px]">{{ user.name|upper if user.name else 'EXPRESS MEMBER' }}</p>
+                  <p class="mt-1.5 text-[10px] uppercase tracking-[0.34em] text-white/35" id="card-variant-label">Metal Gold</p>
+                </div>
+                <div class="flex items-end justify-between">
+                  <span class="text-[12px] font-semibold italic tracking-tight text-white/40">EXPRESS</span>
+                  <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/25">Contactless</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-10 flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-reveal">
+            <button class="color-btn active w-10 h-10 rounded-full border border-black/10 shadow-lg" style="background: linear-gradient(135deg, #e6c456, #b8922a, #f5d96e)" data-color="gold" data-label="Metal Gold" aria-label="Gold"></button>
+            <button class="color-btn w-10 h-10 rounded-full border border-black/10 shadow-lg" style="background: linear-gradient(135deg, #e8b4a0, #c27e68, #f0c4b0)" data-color="rosegold" data-label="Rose Gold" aria-label="Rose Gold"></button>
+            <button class="color-btn w-10 h-10 rounded-full border border-black/10 shadow-lg" style="background: linear-gradient(135deg, #2a2a34, #0c0c10)" data-color="black" data-label="Matte Black" aria-label="Black"></button>
+            <span class="h-6 w-px bg-black/10"></span>
+            <button class="color-btn w-10 h-10 rounded-full border border-black/10 shadow-lg" style="background: linear-gradient(135deg, #f0f0f2, #c8c8cc, #e2e2e6)" data-color="ultra" data-label="Ultra Silver" aria-label="Ultra Silver"></button>
+            <button class="color-btn w-10 h-10 rounded-full border border-black/10 shadow-lg" style="background: linear-gradient(135deg, #bdd4e7, #8fb8de, #a8c9e8)" data-color="ultrablue" data-label="Ultra Sky Blue" aria-label="Ultra Sky Blue"></button>
+          </div>
+          <p class="mt-4 font-mono text-[10px] uppercase tracking-[0.24em] text-[#8a8a92]" id="color-label">Metal Gold</p>
+          <p class="mt-2 text-[11px] text-[#55555d] text-reveal">Available exclusively on the Express Premium plan.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ FEATURES — Detailed ═══ -->
+    <section id="features" class="relative bg-[#fbfbfa] dot-mesh">
+      <div class="relative mx-auto w-full max-w-6xl px-6 py-28 sm:py-36">
+        <div class="mb-14">
+          <div class="text-reveal"><span class="font-mono text-[10px] uppercase tracking-[0.32em] text-[#e35d12]">Benefits &amp; Rewards</span></div>
+          <div class="text-reveal"><h2 class="text-titanium mt-5 max-w-2xl text-[34px] font-normal leading-[1.06] tracking-[-0.02em] sm:text-[52px]">One card. Rewards everywhere you go.</h2></div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-6">
+
+          <!-- F1: Dining -->
+          <div class="lg:col-span-3 text-reveal">
+            <div class="noise feature-card group relative overflow-hidden rounded-3xl border border-black/[0.09] bg-[linear-gradient(165deg,#ffffff_0%,#f6f6f4_100%)] shadow-[0_24px_60px_-24px_rgba(13,13,15,0.10),inset_0_1px_0_0_rgba(255,255,255,0.9)] h-full p-8">
+              <div class="relative z-10">
+                <span class="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a8a92]">01 — Dining</span>
+                <h3 class="mt-4 text-[22px] font-medium leading-tight tracking-tight text-[#0d0d0f] sm:text-[26px]">15% Off All Dining.</h3>
+                <p class="mt-3 text-[14px] leading-relaxed text-[#55555d]">Every meal out is a reward. Get a flawless 15% discount on all your dining experiences—whether you are ordering delivery online or dining in at your favorite restaurants. No minimum spend requirements, and the discount applies instantly.</p>
+                <div class="mt-5 space-y-2.5">
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#e35d12]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e35d12" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    Flat 15% off — no coupon codes needed
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#e35d12]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e35d12" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    Works everywhere online and offline
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#e35d12]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e35d12" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    No minimum order value
+                  </div>
+                </div>
+              </div>
+              <div class="pointer-events-none relative mt-8 flex h-36 items-center justify-center">
+                <div class="absolute size-56 rounded-full bg-[#e35d12] opacity-[0.10] blur-[70px]"></div>
+                <span class="absolute rounded-full border border-[#e35d12]/30 pulse-anim" style="width:56px; height:56px"></span>
+                <span class="absolute rounded-full border border-[#e35d12]/30 pulse-anim" style="width:56px; height:56px; animation-delay: 0.6s"></span>
+                <span class="absolute rounded-full border border-[#e35d12]/30 pulse-anim" style="width:56px; height:56px; animation-delay: 1.2s"></span>
+                <div class="relative flex size-14 items-center justify-center rounded-2xl border border-black/10 bg-[#f4f4f2] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9)]">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="size-6 text-[#e35d12]"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- F2: Lounge (Premium Only) -->
+          <div class="lg:col-span-3 text-reveal">
+            <div class="noise feature-card group relative overflow-hidden rounded-3xl border border-black/[0.09] bg-[linear-gradient(165deg,#ffffff_0%,#f6f6f4_100%)] shadow-[0_24px_60px_-24px_rgba(13,13,15,0.10),inset_0_1px_0_0_rgba(255,255,255,0.9)] h-full p-8">
+              <div class="absolute top-8 right-8 rounded-full border border-[#c2186f]/30 bg-[#c2186f]/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#c2186f]">Premium Only</div>
+              <div class="relative z-10">
+                <span class="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a8a92]">02 — Travel</span>
+                <h3 class="mt-4 text-[22px] font-medium leading-tight tracking-tight text-[#0d0d0f] sm:text-[26px]">Lounge Access. Worldwide.</h3>
+                <p class="mt-3 pr-16 text-[14px] leading-relaxed text-[#55555d]">Travel in comfort with complimentary airport lounge access across 1,200+ lounges in 140+ countries. Walk past the crowds, enjoy premium food and drinks, and recharge before your flight.</p>
+                <div class="mt-5 space-y-2.5">
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#c2186f]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c2186f" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    3 international lounge visits per quarter
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#c2186f]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c2186f" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    3 domestic lounge visits per quarter
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#c2186f]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c2186f" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    24 total lounge visits per year
+                  </div>
+                </div>
+              </div>
+              <div class="relative mt-8">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="rounded-2xl border border-black/[0.07] bg-black/[0.02] p-5 text-center">
+                    <p class="text-[36px] font-light tracking-[-0.03em] text-[#c2186f]">3</p>
+                    <p class="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-[#8a8a92]">International / Qtr</p>
+                  </div>
+                  <div class="rounded-2xl border border-black/[0.07] bg-black/[0.02] p-5 text-center">
+                    <p class="text-[36px] font-light tracking-[-0.03em] text-[#c2186f]">3</p>
+                    <p class="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-[#8a8a92]">Domestic / Qtr</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- F3: Cashback -->
+          <div class="lg:col-span-3 text-reveal">
+            <div class="noise feature-card group relative overflow-hidden rounded-3xl border border-black/[0.09] bg-[linear-gradient(165deg,#ffffff_0%,#f6f6f4_100%)] shadow-[0_24px_60px_-24px_rgba(13,13,15,0.10),inset_0_1px_0_0_rgba(255,255,255,0.9)] h-full p-8">
+              <div class="relative z-10">
+                <span class="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a8a92]">03 — Cashback</span>
+                <h3 class="mt-4 text-[22px] font-medium leading-tight tracking-tight text-[#0d0d0f] sm:text-[26px]">Up to ₹4,000 Cashback / Year.</h3>
+                <p class="mt-3 text-[14px] leading-relaxed text-[#55555d]">Every swipe earns you cashback. Based on your monthly usage, the card rewards you with cashback on all merchant transactions — groceries, fuel, subscriptions, shopping. The more you use, the more you earn.</p>
+                <div class="mt-5 space-y-2.5">
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#e35d12]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e35d12" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    Cashback on all merchant spends
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#e35d12]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e35d12" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    Usage-based rewards — spend more, earn more
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#e35d12]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e35d12" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    Auto-credited monthly — no claim needed
+                  </div>
+                </div>
+              </div>
+              <div class="relative mt-8">
+                <div class="flex h-28 items-end gap-2">
+                  <div class="flex-1 rounded-t-md bg-[linear-gradient(180deg,#e35d12_0%,#f4a574_100%)]" style="height:25%"></div>
+                  <div class="flex-1 rounded-t-md bg-[linear-gradient(180deg,#e35d12_0%,#f4a574_100%)]" style="height:45%"></div>
+                  <div class="flex-1 rounded-t-md bg-[linear-gradient(180deg,#e35d12_0%,#f4a574_100%)]" style="height:35%"></div>
+                  <div class="flex-1 rounded-t-md bg-[linear-gradient(180deg,#e35d12_0%,#f4a574_100%)]" style="height:60%"></div>
+                  <div class="flex-1 rounded-t-md bg-[linear-gradient(180deg,#e35d12_0%,#f4a574_100%)]" style="height:75%"></div>
+                  <div class="flex-1 rounded-t-md bg-[linear-gradient(180deg,#e35d12_0%,#f4a574_100%)]" style="height:55%"></div>
+                  <div class="flex-1 rounded-t-md bg-[linear-gradient(180deg,#e35d12_0%,#f4a574_100%)]" style="height:90%"></div>
+                </div>
+                <div class="mt-4 flex items-center justify-between border-t border-black/[0.07] pt-4">
+                  <span class="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#55555d]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3.5 text-[#e35d12]"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg>
+                    Up to ₹4,000/year
+                  </span>
+                  <span class="rounded-full border border-[#e35d12]/20 bg-[#e35d12]/[0.06] px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.16em] text-[#b8490c]">Usage Based</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- F4: Low Interest -->
+          <div class="lg:col-span-3 text-reveal">
+            <div class="noise feature-card group relative overflow-hidden rounded-3xl border border-black/[0.09] bg-[linear-gradient(165deg,#ffffff_0%,#f6f6f4_100%)] shadow-[0_24px_60px_-24px_rgba(13,13,15,0.10),inset_0_1px_0_0_rgba(255,255,255,0.9)] h-full p-8">
+              <div class="relative z-10">
+                <span class="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a8a92]">04 — Lending</span>
+                <h3 class="mt-4 text-[22px] font-medium leading-tight tracking-tight text-[#0d0d0f] sm:text-[26px]">India's Cheapest Rates.</h3>
+                <p class="mt-3 text-[14px] leading-relaxed text-[#55555d]">Need funds? Express offers personal loans, EMI conversions, and credit lines at rates others can't match. No hidden charges. No processing fee on foreclosure. With a 50-day interest-free period, you keep more of what you earn.</p>
+                <div class="mt-5 space-y-2.5">
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#2f6fae]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f6fae" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    Starting at just 0.99% per month
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#2f6fae]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f6fae" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    Zero foreclosure charges
+                  </div>
+                  <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#2f6fae]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f6fae" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                    50-day interest-free credit period
+                  </div>
+                </div>
+              </div>
+              <div class="relative mt-8">
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="rounded-xl border border-black/[0.07] bg-black/[0.02] p-4 text-center">
+                    <p class="text-[24px] font-light tracking-[-0.02em] text-[#2f6fae]">0.99%</p>
+                    <p class="mt-1 font-mono text-[8px] uppercase tracking-[0.16em] text-[#8a8a92]">Monthly</p>
+                  </div>
+                  <div class="rounded-xl border border-black/[0.07] bg-black/[0.02] p-4 text-center">
+                    <p class="text-[24px] font-light tracking-[-0.02em] text-[#2f6fae]">₹0</p>
+                    <p class="mt-1 font-mono text-[8px] uppercase tracking-[0.16em] text-[#8a8a92]">Foreclosure</p>
+                  </div>
+                  <div class="rounded-xl border border-black/[0.07] bg-black/[0.02] p-4 text-center">
+                    <p class="text-[24px] font-light tracking-[-0.02em] text-[#2f6fae]">50D</p>
+                    <p class="mt-1 font-mono text-[8px] uppercase tracking-[0.16em] text-[#8a8a92]">Interest-free</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- F5: AI Support -->
+          <div class="lg:col-span-6 text-reveal" id="support">
+            <div class="noise feature-card group relative overflow-hidden rounded-3xl border border-black/[0.09] bg-[linear-gradient(165deg,#ffffff_0%,#f6f6f4_100%)] shadow-[0_24px_60px_-24px_rgba(13,13,15,0.10),inset_0_1px_0_0_rgba(255,255,255,0.9)] blueprint-grid p-8 sm:p-10">
+              <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(120,190,255,0.10),transparent_65%)]"></div>
+              <div class="relative grid gap-10 lg:grid-cols-2 lg:items-center">
+                <div>
+                  <span class="inline-flex items-center gap-2 rounded-full border border-[#2f6fae]/25 bg-[#2f6fae]/[0.06] px-3 py-1 font-mono text-[9px] uppercase tracking-[0.2em] text-[#1f5c94]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                    Always Online
+                  </span>
+                  <div class="relative z-10 mt-4">
+                    <span class="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a8a92]">05 — Support</span>
+                    <h3 class="mt-4 text-[22px] font-medium leading-tight tracking-tight text-[#0d0d0f] sm:text-[26px]">24/7 AI-Powered Customer Support.</h3>
+                    <p class="mt-3 max-w-md text-[14px] leading-relaxed text-[#55555d]">No waiting on hold. Our AI chatbot resolves card queries, disputes, billing, EMI conversions, and limit increases instantly — any time, any day. For complex cases, seamless handoff to a human agent.</p>
+                    <div class="mt-5 space-y-2.5">
+                      <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                        <span class="flex size-5 items-center justify-center rounded-full bg-[#2f6fae]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f6fae" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                        Instant EMI conversions &amp; limit increases
+                      </div>
+                      <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                        <span class="flex size-5 items-center justify-center rounded-full bg-[#2f6fae]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f6fae" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                        Dispute resolution &amp; card blocking in seconds
+                      </div>
+                      <div class="flex items-center gap-3 text-[12.5px] text-[#4a4a52]">
+                        <span class="flex size-5 items-center justify-center rounded-full bg-[#2f6fae]/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f6fae" stroke-width="2.5" stroke-linecap="round" class="size-2.5"><path d="M20 6 9 17l-5-5"/></svg></span>
+                        Human handoff for complex queries
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="relative flex items-center justify-center min-h-[280px]">
+                  <div class="relative">
+                    <div class="absolute inset-0 m-auto size-48">
+                      <span class="absolute inset-0 rounded-full border border-[#2f6fae]/20 pulse-anim"></span>
+                      <span class="absolute inset-4 rounded-full border border-[#2f6fae]/30 pulse-anim" style="animation-delay:0.5s"></span>
+                      <span class="absolute inset-8 rounded-full border border-[#2f6fae]/40 pulse-anim" style="animation-delay:1s"></span>
+                    </div>
+                    <div class="relative flex size-48 items-center justify-center">
+                      <div class="flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-[#2f6fae] to-[#1f5c94] shadow-[0_0_60px_rgba(47,111,174,0.35)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      </div>
+                    </div>
+                    <p class="mt-6 text-center font-mono text-[10px] uppercase tracking-[0.24em] text-[#8a8a92]">Try it now &#8212; bottom right corner</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PRICING COMPARISON ═══ -->
+    <section id="pricing" class="relative mx-auto w-full max-w-6xl px-6 py-28 sm:py-36">
+      <div class="mb-16 text-center">
+        <div class="text-reveal"><span class="font-mono text-[10px] uppercase tracking-[0.32em] text-[#e35d12]">Compare Plans</span></div>
+        <div class="text-reveal"><h2 class="text-titanium mx-auto mt-5 max-w-2xl text-[34px] font-normal leading-[1.06] tracking-[-0.02em] sm:text-[52px]">Find the perfect card for you.</h2></div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto [perspective:1600px]" id="pricing-card-wrap">
+        
+        <!-- ULTRA TIER -->
+        <div class="pricing-item noise relative flex flex-col overflow-hidden rounded-[28px] border border-black/[0.08] bg-[linear-gradient(165deg,#ffffff_0%,#f6f6f4_100%)] p-8 shadow-[0_20px_40px_-20px_rgba(13,13,15,0.06)] sm:p-10 transition-transform duration-500 hover:-translate-y-2">
+           <div class="relative z-10 flex flex-col h-full">
+             <h3 class="text-[13px] font-bold uppercase tracking-[0.24em] text-[#3a3a42]">EXPRESS Ultra</h3>
+             <p class="mt-2 text-[13px] text-[#55555d]">The everyday essential.</p>
+             <div class="mt-8 flex items-end gap-3">
+               <span class="text-titanium text-[56px] font-normal leading-none tracking-[-0.04em]">₹799</span>
+               <span class="pb-2 text-[14px] text-[#55555d]">/ year</span>
+             </div>
+             <dl class="mt-8 space-y-3 rounded-2xl border border-black/[0.07] bg-black/[0.02] p-5">
+               <div class="flex items-center justify-between text-[13px]"><dt class="text-[#55555d]">Joining fee</dt><dd class="font-medium text-[#0d0d0f]">₹999</dd></div>
+             </dl>
+             <ul class="mt-8 space-y-4 flex-1">
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#2f6fae]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] text-[#4a4a52]">Premium Plastic Card</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#2f6fae]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] text-[#4a4a52]">15% off all dining</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#2f6fae]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] text-[#4a4a52]">Up to ₹4,000 cashback / year</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#2f6fae]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] text-[#4a4a52]">0.99% p.m. lending rates</span>
+               </li>
+               <li class="flex items-start gap-3 opacity-40">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#8a8a92]"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                 <span class="text-[13.5px] text-[#4a4a52] line-through">Lounge Access</span>
+               </li>
+               <li class="flex items-start gap-3 opacity-40">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#8a8a92]"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                 <span class="text-[13.5px] text-[#4a4a52] line-through">₹2,00,000 Fraud &amp; Loss Recovery</span>
+               </li>
+             </ul>
+             <a href="/apply" class="btn-outline px-6 py-3.5 text-[13px] mt-10 w-full"><span>Apply Ultra</span></a>
+           </div>
+        </div>
+
+        <!-- PREMIUM TIER -->
+        <div class="pricing-item noise relative flex flex-col overflow-hidden rounded-[28px] border border-[#e35d12]/30 bg-[linear-gradient(165deg,#ffffff_0%,#fffaf7_100%)] p-8 shadow-[0_50px_100px_-30px_rgba(227,93,18,0.15)] sm:p-10 transition-transform duration-500 hover:-translate-y-2">
+           <div aria-hidden="true" class="absolute -inset-12 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(227,93,18,0.15),transparent_50%)]"></div>
+           <div class="relative z-10 flex flex-col h-full">
+             <div class="flex items-start justify-between gap-4">
+               <div><h3 class="text-[13px] font-bold uppercase tracking-[0.24em] text-[#e35d12]">EXPRESS Premium</h3><p class="mt-2 text-[13px] text-[#55555d]">The ultimate metal experience.</p></div>
+               <span class="rounded-full bg-[#0d0d0f] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white shadow-md">Best Value</span>
+             </div>
+             <div class="mt-8 flex items-end gap-3">
+               <span class="text-titanium text-[56px] font-normal leading-none tracking-[-0.04em]">₹999</span>
+               <span class="pb-2 text-[14px] text-[#55555d]">/ year</span>
+             </div>
+             <dl class="mt-8 space-y-3 rounded-2xl border border-[#e35d12]/15 bg-[#e35d12]/[0.03] p-5">
+               <div class="flex items-center justify-between text-[13px]"><dt class="text-[#55555d]">Joining fee</dt><dd class="font-medium text-[#0d0d0f]">₹1,499</dd></div>
+             </dl>
+             <ul class="mt-8 space-y-4 flex-1">
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#e35d12]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] font-medium text-[#0d0d0f]">Metal Card (Gold, Rose, Black)</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#e35d12]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] text-[#4a4a52]">15% off all dining</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#e35d12]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] text-[#4a4a52]">Up to ₹4,000 cashback / year</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#e35d12]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] text-[#4a4a52]">0.99% p.m. lending rates</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#e35d12]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] font-medium text-[#0d0d0f]">24 Lounge Visits / year</span>
+               </li>
+               <li class="flex items-start gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-[#e35d12]"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                 <span class="text-[13.5px] font-medium text-[#0d0d0f]">₹2,00,000 Fraud &amp; Loss Recovery</span>
+               </li>
+             </ul>
+             <a href="/apply" class="btn-apply px-6 py-3.5 text-[13px] mt-10 w-full"><span>Apply Premium</span></a>
+           </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ CTA — Orbiting Icons ═══ -->
+    <section class="relative isolate overflow-hidden bg-[#fbfbfa] dot-mesh px-5 py-28 sm:px-6 sm:py-36">
+      <div aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div class="pointer-events-none relative flex items-center justify-center h-[46rem] w-[46rem]">
+          <div class="absolute rounded-full border border-black/[0.07]" style="width:440px; height:440px">
+            <div class="absolute left-1/2 top-0 -ml-8 flex h-1/2 origin-bottom flex-col items-center justify-start" style="--start-angle:-60deg; animation:orbit-cw 26s linear infinite"><div class="relative z-10 -mt-8 rounded-full border border-black/10 bg-white p-3 shadow-[0_8px_24px_-8px_rgba(13,13,15,0.10)] sm:p-3.5" style="--counter-offset:60deg; animation:counter-cw 26s linear infinite"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5 text-[#55555d] md:size-6"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div></div>
+            <div class="absolute left-1/2 top-0 -ml-8 flex h-1/2 origin-bottom flex-col items-center justify-start" style="--start-angle:60deg; animation:orbit-cw 26s linear infinite"><div class="relative z-10 -mt-8 rounded-full border border-black/10 bg-white p-3 shadow-[0_8px_24px_-8px_rgba(13,13,15,0.10)] sm:p-3.5" style="--counter-offset:-60deg; animation:counter-cw 26s linear infinite"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5 text-[#55555d] md:size-6"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2.5"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></div></div>
+            <div class="absolute left-1/2 top-0 -ml-8 flex h-1/2 origin-bottom flex-col items-center justify-start" style="--start-angle:180deg; animation:orbit-cw 26s linear infinite"><div class="relative z-10 -mt-8 rounded-full border border-black/10 bg-white p-3 shadow-[0_8px_24px_-8px_rgba(13,13,15,0.10)] sm:p-3.5" style="--counter-offset:-180deg; animation:counter-cw 26s linear infinite"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5 text-[#55555d] md:size-6"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg></div></div>
+          </div>
+          <div class="absolute rounded-full border border-black/[0.07]" style="width:600px; height:600px">
+            <div class="absolute left-1/2 top-0 -ml-8 flex h-1/2 origin-bottom flex-col items-center justify-start" style="--start-angle:0deg; animation:orbit-ccw 34s linear infinite"><div class="relative z-10 -mt-8 rounded-full border border-black/10 bg-white p-3 shadow-[0_8px_24px_-8px_rgba(13,13,15,0.10)] sm:p-3.5" style="--counter-offset:0deg; animation:counter-ccw 34s linear infinite"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5 text-[#55555d] md:size-6"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div></div>
+            <div class="absolute left-1/2 top-0 -ml-8 flex h-1/2 origin-bottom flex-col items-center justify-start" style="--start-angle:180deg; animation:orbit-ccw 34s linear infinite"><div class="relative z-10 -mt-8 rounded-full border border-black/10 bg-white p-3 shadow-[0_8px_24px_-8px_rgba(13,13,15,0.10)] sm:p-3.5" style="--counter-offset:-180deg; animation:counter-ccw 34s linear infinite"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-5 text-[#55555d] md:size-6"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="relative z-10 mx-auto flex max-w-lg flex-col items-center text-center">
+        <div class="text-reveal"><span class="font-mono text-[10px] uppercase tracking-[0.32em] text-[#e35d12]">Why Express</span></div>
+        <div class="text-reveal"><h2 class="text-titanium mt-5 text-[34px] font-normal leading-[1.06] tracking-[-0.02em] sm:text-[48px]">Because you're worth it.</h2></div>
+        <div class="text-reveal"><p class="mt-5 text-[15px] leading-relaxed text-[#55555d]">India's cheapest lending rates. Premium dining rewards. Worldwide lounge access. Up to ₹4,000 cashback. All in a card that turns heads.</p></div>
+        <div class="text-reveal mt-9">
+          <a href="/apply" class="btn-apply px-6 py-3 text-[13px]"><span>Apply Now <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ MY CARD DASHBOARD (only if user has a card) ═══ -->
+    {% if card %}
+    <section id="my-card" class="relative bg-[#fbfbfa] py-16 sm:py-24 px-4 sm:px-6 border-t border-black/[0.06]">
+      <div class="mx-auto max-w-5xl">
+        <div class="text-center mb-10 sm:mb-14 text-reveal">
+          <span class="font-mono text-[10px] uppercase tracking-[0.32em] text-[#e35d12] font-semibold">Live Card Account</span>
+          <h2 class="text-titanium mt-2 text-[28px] sm:text-[42px] font-normal leading-tight tracking-[-0.02em]">Your Express Card & Limits</h2>
+          <p class="text-xs sm:text-sm text-gray-500 font-mono mt-1">Real-time balances, card security, and billing overview</p>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Left Col: Card Visual & Controls (5 cols) -->
+          <div class="lg:col-span-5 text-reveal flex flex-col items-center">
+            <div class="relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 {% if card.card_type == 'premium' %}finish-metal{% else %}finish-plastic{% endif %} card-{{ card.color or 'gold' }}">
+              <div class="relative z-[2] flex h-full flex-col justify-between p-6 sm:p-7">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm sm:text-base font-display italic font-bold tracking-widest text-white/90">EXPRESS</span>
+                  <span class="text-[9px] uppercase font-mono tracking-widest px-2 py-0.5 rounded bg-white/20 text-white font-semibold">
+                    {% if card.card_type == 'premium' %}METAL{% else %}PLASTIC{% endif %}
+                  </span>
+                </div>
+                <div>
+                  <div class="w-9 h-7 bg-yellow-100/60 rounded-md border border-white/30 mb-3 shadow-inner"></div>
+                  <p class="text-sm sm:text-base uppercase tracking-[0.25em] text-white/90 font-mono mb-1.5">
+                    •••• •••• •••• {{ card.last4 | default('7163') }}
+                  </p>
+                  <div class="flex items-end justify-between">
+                    <div>
+                      <p class="text-xs tracking-[0.18em] text-white/90 font-mono font-medium">{{ user.name|upper if user.name else 'EXPRESS MEMBER' }}</p>
+                      <p class="text-[8px] uppercase tracking-[0.24em] text-white/50 mt-0.5 font-mono">{{ card.card_type|capitalize }} {{ card.color|capitalize }}</p>
+                    </div>
+                    <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/40">Contactless</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Controls (CVV Eye Toggle & Manage) -->
+            <div class="w-full max-w-[360px] mt-4 flex items-center justify-between bg-white border border-black/[0.06] rounded-2xl p-4 shadow-sm">
+              <div class="flex items-center gap-2.5">
+                <span class="text-xs font-mono uppercase tracking-wider text-gray-500 font-semibold">CVV:</span>
+                <span id="card-cvv-text" class="font-mono text-base tracking-widest text-gray-900 font-bold">•••</span>
+                <button type="button" id="cvv-eye-toggle" class="text-gray-400 hover:text-[#e35d12] transition-colors p-1 rounded-md" title="Toggle CVV View">
+                  <svg id="eye-icon-closed" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                  <svg id="eye-icon-open" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+              <a href="/dashboard" class="text-xs font-semibold text-[#e35d12] hover:underline flex items-center gap-1 font-mono">
+                Manage Card →
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Col: Limits, Utilisation, Dues & EMI (7 cols) -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- Credit Limit & Percentage Bar -->
+            <div class="text-reveal bg-white rounded-2xl border border-black/[0.06] p-6 shadow-sm">
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <span class="text-[10px] uppercase tracking-[0.2em] text-[#8a8a92] font-mono font-semibold block mb-0.5">Total Approved Limit</span>
+                  <span class="text-2xl sm:text-3xl font-bold text-[#0d0d0f]">₹{{ "{:,}".format(card.credit_limit) }}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[11px] font-mono font-bold px-3 py-1 rounded-full {% if card.spent == 0 or not card.spent %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                    {{ card.available_percent | default(100) }}% Available
+                  </span>
+                  <span class="text-[10px] text-gray-400 font-mono block mt-1">({{ card.utilisation | default(0) }}% Utilised)</span>
+                </div>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden mb-3.5 p-0.5">
+                <div class="h-full bg-gradient-to-r from-emerald-500 to-[#e35d12] rounded-full transition-all duration-1000" style="width: {{ card.utilisation | default(0) }}%"></div>
+              </div>
+
+              <div class="flex justify-between text-xs sm:text-sm font-mono">
+                <span class="text-gray-500">Spent: <strong class="text-[#0d0d0f]">₹{{ "{:,}".format(card.spent | default(0)) }}</strong></span>
+                <span class="text-gray-500">Available: <strong class="text-emerald-600">₹{{ "{:,}".format(card.available_limit | default(card.credit_limit)) }}</strong></span>
+              </div>
+            </div>
+
+            <!-- Zero Spent State or Active Dues State -->
+            {% if card.spent == 0 or not card.spent %}
+            <div class="text-reveal bg-emerald-50/80 border border-emerald-200/80 rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                    ✓
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-emerald-950">Credit is not used yet</h4>
+                    <p class="text-xs text-emerald-800 font-mono">No dues right now • ₹0.00 Outstanding Balance</p>
+                  </div>
+                </div>
+                <span class="text-[10px] uppercase font-mono px-3 py-1 rounded-full bg-emerald-200/60 text-emerald-900 font-bold hidden sm:inline-block">
+                  Next Bill: 1st
+                </span>
+              </div>
+            </div>
+            {% else %}
+            <div class="text-reveal bg-amber-50/80 border border-amber-200/80 rounded-2xl p-5 shadow-sm">
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="text-[10px] uppercase tracking-[0.2em] text-amber-800 font-mono block mb-0.5">Next Minimum Due (5%)</span>
+                  <span class="text-xl sm:text-2xl font-bold text-amber-950">₹{{ "{:,}".format(card.min_due) }}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] uppercase tracking-[0.2em] text-amber-800 font-mono block mb-0.5">Payment Due Date</span>
+                  <span class="text-sm font-bold text-amber-950 font-mono">15th of month</span>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- EMI Plans -->
+            <div class="text-reveal bg-white rounded-2xl border border-black/[0.06] p-5 sm:p-6 shadow-sm">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-[10px] uppercase tracking-[0.2em] text-[#8a8a92] font-mono font-semibold">Flexible 0.99% EMI Plans</span>
+                <span class="text-xs text-[#e35d12] font-mono font-semibold">No Cost EMIs</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
+                <button type="button" class="py-2.5 px-2 rounded-xl border-2 border-[#e35d12] bg-[#e35d12]/5 text-[#e35d12] text-xs sm:text-sm font-semibold transition-all">
+                  3 Months
+                </button>
+                <button type="button" class="py-2.5 px-2 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 text-xs sm:text-sm font-medium transition-all">
+                  6 Months
+                </button>
+                <button type="button" class="py-2.5 px-2 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 text-xs sm:text-sm font-medium transition-all">
+                  12 Months
+                </button>
+              </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="text-reveal grid grid-cols-2 gap-3 sm:gap-4">
+              <div class="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-sm text-center">
+                <span class="text-xl sm:text-2xl font-bold text-[#0d0d0f] font-mono">{{ card.on_time_payments | default(0) }}</span>
+                <span class="text-[10px] uppercase tracking-[0.16em] text-[#8a8a92] font-mono block mt-1">On-time Payments</span>
+              </div>
+              <div class="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-sm text-center">
+                <span class="text-xl sm:text-2xl font-bold text-[#0d0d0f] font-mono">{{ card.limit_increases | default(0) }}</span>
+                <span class="text-[10px] uppercase tracking-[0.16em] text-[#8a8a92] font-mono block mt-1">Limit Increases</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+  </main>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="border-t border-black/[0.07] bg-[#fbfbfa]">
+    <div class="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-12 sm:flex-row sm:justify-between">
+      <div class="flex items-center gap-6">
+        <a href="#top" class="logo-group"><span class="logo-glow"></span><span class="logo-text text-[0.95em]">EXPRESS</span><svg viewBox="0 0 24 24" class="logo-accent" style="width:0.6em;height:0.6em" fill="none" stroke="#e35d12" stroke-width="2.4" stroke-linecap="round"><path d="M4 13a10 10 0 0 1 10-10"></path><path d="M6.5 17a6.5 6.5 0 0 1 6.5-6.5" opacity="0.75"></path><path d="M9 21a3 3 0 0 1 3-3" opacity="0.5"></path></svg></a>
+        <span class="h-4 w-px bg-black/10"></span>
+        <p class="font-mono text-[9px] uppercase tracking-[0.2em] text-[#8a8a92]">I Am Worth It</p>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#features" class="nav-link font-mono text-[9px] uppercase tracking-[0.18em] text-[#8a8a92]">Features</a>
+        <a href="/apply" class="nav-link font-mono text-[9px] uppercase tracking-[0.18em] text-[#8a8a92]">Pricing</a>
+        <a href="#support" class="nav-link font-mono text-[9px] uppercase tracking-[0.18em] text-[#8a8a92]">Support</a>
+      </div>
+    </div>
+    <div class="border-t border-black/[0.05]">
+      <div class="mx-auto max-w-6xl px-6 py-6 text-center">
+        <p class="font-mono text-[9px] uppercase tracking-[0.16em] text-[#b4b4bc]">© 2026 Express Financial Services. All rights reserved. RBI Licensed NBFC.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══ JAVASCRIPT ═══ -->
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Profile Dropdown Toggle
+    const profileToggle = document.getElementById('profile-toggle');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    if (profileToggle && profileDropdown) {
+      profileToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        if (!profileDropdown.contains(e.target) && !profileToggle.contains(e.target)) {
+          profileDropdown.classList.add('hidden');
+        }
+      });
+    }
+
+    // CVV Eye Toggle
+    const cvvToggle = document.getElementById('cvv-eye-toggle');
+    const cvvText = document.getElementById('card-cvv-text');
+    const eyeClosed = document.getElementById('eye-icon-closed');
+    const eyeOpen = document.getElementById('eye-icon-open');
+    let isCvvVisible = false;
+
+    if (cvvToggle && cvvText) {
+      cvvToggle.addEventListener('click', () => {
+        isCvvVisible = !isCvvVisible;
+        if (isCvvVisible) {
+          cvvText.textContent = '832';
+          eyeClosed.classList.add('hidden');
+          eyeOpen.classList.remove('hidden');
+        } else {
+          cvvText.textContent = '•••';
+          eyeClosed.classList.remove('hidden');
+          eyeOpen.classList.add('hidden');
+        }
+      });
+    }
+
+    // Header entrance
+    gsap.to('#site-header', { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.3 });
+
+    // Hero lines stagger
+    gsap.from('.hero-line', {
+      y: 60, opacity: 0, filter: 'blur(8px)',
+      duration: 1.2, ease: 'power3.out', stagger: 0.15, delay: 0.5,
+    });
+
+    // Hero card scroll — Normal expansion
+    gsap.to('#hero-card', {
+      scrollTrigger: { trigger: '#top section', start: 'top top', end: 'bottom bottom', scrub: 0.6 },
+      width: '55vw', maxWidth: '600px', maxHeight: '55vh', borderRadius: '24px', ease: 'none',
+    });
+
+    // Text reveal on scroll
+    const revealEls = document.querySelectorAll('.text-reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          entry.target.style.transitionDelay = (Array.from(revealEls).indexOf(entry.target) % 4) * 0.1 + 's';
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // Pulse rings
+    document.querySelectorAll('.pulse-anim').forEach((ring, i) => {
+      ring.style.animation = 'pulse-ring 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite';
+      ring.style.animationDelay = i * 0.7 + 's';
+    });
+
+    // Card color selector
+    const colorBtns = document.querySelectorAll('.color-btn');
+    const cardBg = document.getElementById('card-bg');
+    const cardVariantLabel = document.getElementById('card-variant-label');
+    const colorLabel = document.getElementById('color-label');
+    const cardClasses = { gold: 'card-gold', rosegold: 'card-rosegold', black: 'card-black', ultra: 'card-ultra', ultrablue: 'card-ultrablue' };
+
+    colorBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        colorBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const color = btn.dataset.color;
+        const label = btn.dataset.label;
+        cardBg.className = 'absolute inset-0 transition-all duration-700 ' + cardClasses[color];
+        cardVariantLabel.textContent = label;
+        if(colorLabel) colorLabel.textContent = label;
+      });
+    });
+
+    // 3D card tilt
+    const showcaseCard = document.getElementById('showcase-card');
+    if (showcaseCard) {
+      showcaseCard.addEventListener('mousemove', e => {
+        const rect = showcaseCard.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        showcaseCard.style.transform = 'rotateY(' + (x * 16) + 'deg) rotateX(' + (-y * 10) + 'deg)';
+      });
+      showcaseCard.addEventListener('mouseleave', () => {
+        gsap.to(showcaseCard, { rotateY: 0, rotateX: 0, duration: 0.6, ease: 'power2.out' });
+      });
+    }
+
+    // Pricing items stagger
+    ScrollTrigger.create({
+      trigger: '#pricing-card-wrap',
+      start: 'top 65%',
+      once: true,
+      onEnter: () => {
+        gsap.to('.pricing-item', {
+          opacity: 1, x: 0, y: 0, duration: 0.6, ease: 'power2.out',
+          stagger: 0.15,
+        });
+      },
+    });
+
+    // -- Chatbot --
+    function toggleChatbot() {
+      document.getElementById('chatbot-window').classList.toggle('open');
+      var input = document.getElementById('chatbot-input');
+      if (document.getElementById('chatbot-window').classList.contains('open')) {
+        setTimeout(function() { input.focus(); }, 300);
+      }
+    }
+
+    var botResponses = {
+      'check my balance': 'Your current outstanding is Rs 12,450. Available credit limit: Rs 2,87,550. Payment due: Aug 28.',
+      'convert to emi': 'Your last purchase of Rs 24,999 can be converted to 6 EMIs at 0.99% p.m. First EMI: Sept 1. Shall I proceed?',
+      'block my card': 'I can block your card ending in 7163 immediately. This is irreversible until a replacement is issued. Confirm to proceed.',
+    };
+    var defaultReply = 'I understand your query. Let me connect you with the right information. Is there anything specific about your Express card I can help with?';
+
+    function addMsg(text, isUser) {
+      var msgs = document.getElementById('chatbot-msgs');
+      var wrapper = document.createElement('div');
+      wrapper.className = 'flex ' + (isUser ? 'justify-end' : 'justify-start');
+      wrapper.style.opacity = '0';
+      wrapper.style.transform = 'translateY(8px)';
+      var bubble = document.createElement('div');
+      bubble.className = isUser
+        ? 'rounded-2xl rounded-tr-sm bg-[#0d0d0f] px-4 py-3 text-[13px] leading-relaxed text-white max-w-[85%]'
+        : 'rounded-2xl rounded-tl-sm bg-white border border-black/[0.06] shadow-sm px-4 py-3 text-[13px] leading-relaxed text-[#3a3a42] max-w-[85%]';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      msgs.appendChild(wrapper);
+      msgs.scrollTop = msgs.scrollHeight;
+      requestAnimationFrame(function() {
+        wrapper.style.transition = 'all 0.3s ease';
+        wrapper.style.opacity = '1';
+        wrapper.style.transform = 'translateY(0)';
+      });
+    }
+
+    function sendQuickMsg(btn) {
+      var text = btn.textContent.trim();
+      addMsg(text, true);
+      var quickBtns = document.getElementById('quick-btns');
+      if (quickBtns) quickBtns.remove();
+      var key = text.toLowerCase();
+      setTimeout(function() {
+        addMsg(botResponses[key] || defaultReply, false);
+      }, 600);
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      var input = document.getElementById('chatbot-input');
+      var text = input.value.trim();
+      if (!text) return;
+      addMsg(text, true);
+      input.value = '';
+      var key = text.toLowerCase();
+      setTimeout(function() {
+        addMsg(botResponses[key] || defaultReply, false);
+      }, 600);
+    }
+
+    // -- Mouse Follow Glow on Hero --
+    var heroWrap = document.querySelector('.hero-wrap');
+    var glowCursor = document.getElementById('glow-cursor');
+    if (heroWrap && glowCursor) {
+      heroWrap.style.cursor = 'default';
+      heroWrap.addEventListener('mousemove', function(e) {
+        var rect = heroWrap.getBoundingClientRect();
+        var x = e.clientX - rect.left - 250;
+        var y = e.clientY - rect.top - 250;
+        glowCursor.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      });
+      heroWrap.addEventListener('mouseleave', function() {
+        glowCursor.style.opacity = '0';
+      });
+      heroWrap.addEventListener('mouseenter', function() {
+        glowCursor.style.opacity = '1';
+      });
+    }
+  </script>
+
+
+  <!-- FLOATING CHATBOT -->
+  <div id="chatbot-fab" onclick="toggleChatbot()">
+    <span class="fab-pulse"></span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="relative z-10"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </div>
+
+  <div id="chatbot-window">
+    <div class="flex items-center gap-3 border-b border-black/[0.06] bg-[#fafafa] px-5 py-4 shrink-0">
+      <div class="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-[#2f6fae] to-[#1f5c94]">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-[13px] font-medium text-[#0d0d0f]">Express AI</p>
+        <div class="flex items-center gap-1.5"><span class="size-1.5 rounded-full bg-green-400"></span><p class="text-[10px] text-[#8a8a92]">Online now</p></div>
+      </div>
+      <button onclick="toggleChatbot()" class="flex size-8 items-center justify-center rounded-full hover:bg-black/[0.04] transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8a92" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="chatbot-msgs" class="flex-1 overflow-y-auto p-5 space-y-4" style="background: linear-gradient(180deg, #f8f8f6 0%, #ffffff 100%)">
+      <div class="flex justify-start"><div class="rounded-2xl rounded-tl-sm bg-white border border-black/[0.06] shadow-sm px-4 py-3 text-[13px] leading-relaxed text-[#3a3a42] max-w-[85%]">Hi there! I am your Express AI assistant. How can I help you today?</div></div>
+      <div class="flex flex-wrap gap-2 pl-1" id="quick-btns">
+        <button onclick="sendQuickMsg(this)" class="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[11px] text-[#55555d] hover:border-[#e35d12]/30 hover:bg-[#e35d12]/[0.04] transition-all">Check my balance</button>
+        <button onclick="sendQuickMsg(this)" class="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[11px] text-[#55555d] hover:border-[#e35d12]/30 hover:bg-[#e35d12]/[0.04] transition-all">Convert to EMI</button>
+        <button onclick="sendQuickMsg(this)" class="rounded-full border border-black/[0.08] bg-white px-3.5 py-1.5 text-[11px] text-[#55555d] hover:border-[#e35d12]/30 hover:bg-[#e35d12]/[0.04] transition-all">Block my card</button>
+      </div>
+    </div>
+    <div class="border-t border-black/[0.06] bg-white px-4 py-3 shrink-0">
+      <form id="chatbot-form" class="flex items-center gap-2" onsubmit="handleChatSubmit(event)">
+        <input type="text" id="chatbot-input" placeholder="Type a message..." class="flex-1 rounded-full bg-[#f4f4f2] px-4 py-2.5 text-[13px] text-[#0d0d0f] outline-none placeholder:text-[#8a8a92] focus:ring-2 focus:ring-[#e35d12]/20 transition-all">
+        <button type="submit" class="flex size-9 items-center justify-center rounded-full bg-[#0d0d0f] shrink-0 hover:bg-[#e35d12] transition-colors shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="m22 2-11 11"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+import sqlite3
+from flask import g
+import os
+
+DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'express.db')
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = sqlite3.Row
+    return db
+
+def init_db():
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(DATABASE), exist_ok=True)
+    
+    with sqlite3.connect(DATABASE) as db:
+        cursor = db.cursor()
+        
+        # users table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY,
+                phone TEXT UNIQUE,
+                name TEXT,
+                dob TEXT,
+                age INTEGER,
+                aadhaar_verified BOOLEAN DEFAULT 0,
+                pan_verified BOOLEAN DEFAULT 0,
+                aadhaar_number TEXT,
+                pan_number TEXT,
+                income_type TEXT,
+                monthly_income INTEGER,
+                otp TEXT,
+                otp_expires REAL,
+                session_token TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+
+        # Lightweight migrations for databases created by earlier versions.
+        existing_columns = {row[1] for row in cursor.execute("PRAGMA table_info(users)")}
+        if 'statement_name' not in existing_columns:
+            cursor.execute('ALTER TABLE users ADD COLUMN statement_name TEXT')
+        if 'terms_accepted_at' not in existing_columns:
+            cursor.execute('ALTER TABLE users ADD COLUMN terms_accepted_at TIMESTAMP')
+        
+        # cards table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS cards (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id),
+                card_type TEXT,
+                color TEXT,
+                status TEXT DEFAULT 'processing',
+                credit_limit INTEGER DEFAULT 25000,
+                available_limit INTEGER DEFAULT 25000,
+                order_date TEXT,
+                delivery_date TEXT,
+                card_number TEXT,
+                on_time_payments INTEGER DEFAULT 0,
+                limit_increases INTEGER DEFAULT 0
+            )
+        ''')
+        
+        # transactions table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                amount REAL,
+                merchant TEXT,
+                category TEXT,
+                date TEXT,
+                is_emi BOOLEAN DEFAULT 0,
+                emi_months INTEGER,
+                emi_rate REAL,
+                emi_paid INTEGER DEFAULT 0
+            )
+        ''')
+        
+        # payments table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS payments (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                amount REAL,
+                due_date TEXT,
+                paid_date TEXT,
+                on_time BOOLEAN
+            )
+        ''')
+        
+        # addresses table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS addresses (
+                id INTEGER PRIMARY KEY,
+                user_id INTEGER,
+                line1 TEXT,
+                line2 TEXT,
+                apartment TEXT,
+                pincode TEXT,
+                city TEXT,
+                state TEXT,
+                country TEXT DEFAULT 'India'
+            )
+        ''')
+        
+        db.commit()
+
+def get_user_by_phone(phone):
+    db = get_db()
+    return db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
+
+def get_user_by_id(user_id):
+    db = get_db()
+    return db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+
+def get_user_card(user_id):
+    db = get_db()
+    return db.execute('SELECT * FROM cards WHERE user_id = ?', (user_id,)).fetchone()
+
+def get_user_address(user_id):
+    db = get_db()
+    return db.execute('SELECT * FROM addresses WHERE user_id = ?', (user_id,)).fetchone()
+
+def get_user_transactions(user_id):
+    db = get_db()
+    return db.execute('SELECT * FROM transactions WHERE user_id = ?', (user_id,)).fetchall()
+
+def get_user_payments(user_id):
+    db = get_db()
+    return db.execute('SELECT * FROM payments WHERE user_id = ?', (user_id,)).fetchall()

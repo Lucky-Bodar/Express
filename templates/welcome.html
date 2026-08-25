@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}EXPRESS — I Am Worth It{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        background-color: #faf9f7 !important;
+        color: #0d0d0f !important;
+        overflow: hidden;
+    }
+    .letter {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(35px) scale(0.9) rotate(2deg);
+        filter: blur(10px);
+        will-change: transform, opacity, filter;
+    }
+    .wave-text {
+        opacity: 0;
+        transform: translateY(20px);
+        background: linear-gradient(135deg, #0d0d0f 0%, #4a4a52 50%, #0d0d0f 100%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmerWave 4s ease infinite;
+    }
+    @keyframes shimmerWave {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .radial-luxury-glow {
+        background: radial-gradient(circle, rgba(227, 93, 18, 0.12) 0%, rgba(246, 243, 239, 0) 70%);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main id="splash-container" class="flex-1 flex flex-col items-center justify-center relative overflow-hidden bg-[#faf9f7] cursor-pointer min-h-screen px-4 select-none" onclick="skipSplash()">
+    <!-- Ambient luxury radial glow -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div class="w-[320px] sm:w-[600px] h-[320px] sm:h-[600px] rounded-full radial-luxury-glow blur-[100px] sm:blur-[140px] animate-pulse"></div>
+    </div>
+    
+    <div class="z-10 flex flex-col items-center text-center max-w-4xl mx-auto">
+        <!-- Eyebrow -->
+        <p id="eyebrow" class="text-[10px] sm:text-xs font-mono uppercase tracking-[0.32em] text-[#e35d12] mb-6 opacity-0 translate-y-3">
+            The Next Generation Card
+        </p>
+
+        <!-- Express Letter by Letter -->
+        <h1 id="express-logo" class="text-5xl sm:text-8xl md:text-9xl font-display italic tracking-tight text-[#0d0d0f] font-normal leading-none mb-2">
+            <span class="letter">E</span><span class="letter">X</span><span class="letter">P</span><span class="letter">R</span><span class="letter">E</span><span class="letter">S</span><span class="letter">S</span>
+        </h1>
+
+        <!-- Elegant expanding divider -->
+        <div id="divider" class="w-0 h-[1px] bg-gradient-to-r from-transparent via-[#e35d12]/50 to-transparent my-6 sm:my-8 opacity-0"></div>
+
+        <!-- Tagline: I Am Worth It appearing at once with wave shimmer -->
+        <div id="tagline-wrap" class="overflow-hidden">
+            <p id="tagline" class="wave-text text-2xl sm:text-4xl md:text-5xl font-display italic tracking-wide">
+                I Am Worth It
+            </p>
+        </div>
+
+        <!-- Subtle Skip Prompt -->
+        <p id="tap-prompt" class="font-mono text-[9px] uppercase tracking-[0.24em] text-black/30 mt-12 opacity-0">
+            Click anywhere to continue
+        </p>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let skipTriggered = false;
+
+    function skipSplash() {
+        if (skipTriggered) return;
+        skipTriggered = true;
+        gsap.to("#splash-container", {
+            opacity: 0, scale: 0.98, duration: 0.6, ease: "power2.inOut",
+            onComplete: () => { window.location.href = '/login'; }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const letters = document.querySelectorAll('.letter');
+        const tl = gsap.timeline();
+        
+        // 1. Eyebrow fades in gently
+        tl.to("#eyebrow", {
+            opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: 0.2
+        })
+        // 2. EXPRESS letter-by-letter stagger entrance
+        .to(letters, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotation: 0,
+            filter: "blur(0px)",
+            duration: 0.7,
+            stagger: 0.1,
+            ease: "back.out(1.4)"
+        }, "-=0.2")
+        // 3. Divider expands smoothly
+        .to("#divider", {
+            width: "160px",
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.inOut"
+        }, "-=0.2")
+        // 4. "I Am Worth It" appears all at once with smooth wave entrance
+        .to("#tagline", {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            ease: "power3.out"
+        }, "-=0.3")
+        // 5. Tap prompt subtle fade
+        .to("#tap-prompt", {
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.out"
+        }, "+=0.2");
+
+        // Auto transition after timeline completes
+        setTimeout(() => {
+            skipSplash();
+        }, 4600);
+    });
+</script>
+{% endblock %}
