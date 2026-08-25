@@ -2,11 +2,17 @@ import sqlite3
 from flask import g
 import os
 
-DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'express.db')
+# Use /tmp on Vercel or read-only serverless filesystems
+if os.environ.get('VERCEL') or not os.access(os.path.dirname(os.path.abspath(__file__)), os.W_OK):
+    DATABASE = '/tmp/express.db'
+else:
+    DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'express.db')
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
+        if not os.path.exists(DATABASE):
+            init_db()
         db = g._database = sqlite3.connect(DATABASE)
         db.row_factory = sqlite3.Row
     return db
