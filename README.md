@@ -4,6 +4,19 @@
 
 ---
 
+## 🔑 Demo Access & Interactive Evaluation
+
+For reviewers, evaluators, and prospective cardholders exploring the interactive prototype:
+
+| Step | Test Credential / Action | Purpose & Expected Behavior |
+|:---|:---|:---|
+| **Mobile Number** | Any valid 10-digit number *(e.g., `9876543210`)* | Initiates encrypted authentication handshake |
+| **Verification Code (OTP)** | **`123456`** | Instant one-time password verification bypass |
+| **Age Eligibility (21+)** | **`15/08/1998`** | Unlocks the complete 8-step application & approval pipeline |
+| **Waitlist Showcase (<21)** | **`01/01/2008`** | Demonstrates the obsidian-dark priority queue experience |
+
+---
+
 ## 🏛️ About Express
 
 **Express** is an elite credit card and financial lifestyle platform architected for the ambitious, discerning generation. Founded on the conviction that financial empowerment should be wrapped in uncompromising elegance, Express merges timeless luxury craftsmanship with next-generation fintech infrastructure.
@@ -62,16 +75,22 @@ Credit is more than purchasing power—it is a daily statement of personal worth
 
 ---
 
-## 👨‍💻 Created & Engineered By
+## 👑 Executive Architecture & Leadership
 
 ### **Lucky Bodar**
-*Founder, Lead Architect & Product Designer*
+**Founder • Principal Architect & Lead Product Designer**
 
-> Conceptualized, engineered, and designed from the ground up by **Lucky Bodar**, **Express** represents the intersection of luxury design and financial technology. Built to challenge traditional banking interfaces, the platform seamlessly harmonizes editorial typography, high-performance animations, transparent underwriting, and robust security controls into a unified financial lifestyle application.
+> *“Express was conceived to transcend conventional consumer finance by uniting bespoke haute-couture design paradigms with deterministic fintech engineering. Every interface transition, security protocol, and underwriting milestone has been meticulously crafted to elevate the relationship between personal ambition and financial power.”*
+
+#### **Core Disciplines & Contributions:**
+* **Visionary Product Leadership**: Pioneered the end-to-end conceptualization and architectural roadmap for the Express brand ecosystem and the *"I Am Worth It"* philosophy.
+* **Haute-Couture UI/UX Design**: Directed the visual identity, editorial typography hierarchies, custom shaders for metal finishes, and GSAP micro-interaction physics.
+* **Full-Stack Systems Architecture**: Engineered the performant backend framework, modular API endpoints, automated KYC verification algorithms, and dynamic state-management pipelines.
+* **Fintech Security Engineering**: Implemented client-side token masking, cryptographic credential validation, zero-liability fraud frameworks, and real-time transaction-control switches.
 
 ---
 
 <div align="center">
   <p><b>Express Financial Services</b> • <i>I Am Worth It</i></p>
-  <p>© 2026 Express. Crafted with passion by <b>Lucky Bodar</b>. All rights reserved.</p>
+  <p>© 2026 Express. Vision, Architecture & Design by <b>Lucky Bodar</b>. All rights reserved.</p>
 </div>
