@@ -20,56 +20,51 @@ function formatCardNumber(value) {
 function showConfetti() {
     const colors = ['#e35d12', '#c2186f', '#2f6fae', '#ffffff', '#ffd700'];
     const container = document.createElement('div');
-    container.style.position = 'fixed';
-    container.style.top = '0';
-    container.style.left = '0';
-    container.style.width = '100vw';
-    container.style.height = '100vh';
-    container.style.pointerEvents = 'none';
-    container.style.zIndex = '9999';
+    container.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;overflow:hidden;';
     document.body.appendChild(container);
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 40; i++) {
         const confetti = document.createElement('div');
-        confetti.style.position = 'absolute';
-        confetti.style.width = '10px';
-        confetti.style.height = '10px';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.borderRadius = '50%';
-        confetti.style.top = '50%';
-        confetti.style.left = '50%';
-        
-        // Random destination
-        const tx = (Math.random() - 0.5) * 500;
-        const ty = (Math.random() - 0.5) * 500;
-        
+        const size = 6 + Math.random() * 8;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const startX = Math.random() * 100;
+        const drift = (Math.random() - 0.5) * 200;
+        const duration = 1.5 + Math.random() * 1.5;
+        const delay = Math.random() * 0.5;
+
+        confetti.style.cssText = `
+            position:absolute;
+            width:${size}px; height:${size}px;
+            background:${color};
+            border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+            top:-20px; left:${startX}%;
+            opacity:1;
+            animation: confettiFall ${duration}s ease-out ${delay}s forwards;
+        `;
         container.appendChild(confetti);
-        
-        gsap.to(confetti, {
-            x: tx,
-            y: ty,
-            opacity: 0,
-            duration: 1.5 + Math.random(),
-            ease: "power2.out",
-            onComplete: () => {
-                confetti.remove();
-            }
-        });
     }
-    
-    setTimeout(() => {
-        container.remove();
-    }, 3000);
+
+    // Inject keyframes if not already present
+    if (!document.getElementById('confetti-keyframes')) {
+        const style = document.createElement('style');
+        style.id = 'confetti-keyframes';
+        style.textContent = `
+            @keyframes confettiFall {
+                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setTimeout(() => container.remove(), 4000);
 }
 
 function animateProgressBar(step, total) {
     const percentage = (step / total) * 100;
-    gsap.to('#progress-bar-fill', {
-        width: `${percentage}%`,
-        duration: 0.5,
-        ease: 'power2.inOut'
-    });
-    
+    const barFill = document.getElementById('progress-bar-fill');
+    if (barFill) barFill.style.width = percentage + '%';
+
     const stepCounter = document.getElementById('step-counter');
     if (stepCounter) {
         stepCounter.textContent = `Step ${step} of ${total}`;

@@ -680,60 +680,43 @@ document.addEventListener('DOMContentLoaded', () => {
         ultrablue: 'from-sky-400 via-sky-300 to-sky-500'
     };
 
+
+    // Reset all steps to avoid layout interference
+    document.querySelectorAll('.step').forEach((s, idx) => {
+        s.style.opacity = '';
+        s.style.transform = '';
+        s.style.display = (idx === 0) ? 'block' : 'none';
+        s.classList.toggle('active', idx === 0);
+    });
+
     const stepTitles = {
-        1: 'Aadhaar Verification',
-        2: 'PAN Card Verification',
-        3: 'Employment & Income',
-        4: 'Bank Statement Upload',
-        5: 'Select Card Tier',
-        6: 'Card Finish & Color',
-        7: 'Payment Confirmation',
-        8: 'Delivery Address',
-        9: 'Order Confirmed'
+        1: 'Aadhaar Verification', 2: 'PAN Card Verification', 3: 'Employment & Income',
+        4: 'Bank Statement Upload', 5: 'Select Card Tier', 6: 'Card Finish & Color',
+        7: 'Payment Confirmation', 8: 'Delivery Address', 9: 'Order Confirmed'
     };
 
     function goToStep(next) {
-        const cur = document.querySelector('.step.active');
         const nxt = document.querySelector(`.step[data-step="${next}"]`);
         if (!nxt) return;
 
-        // Ensure all other steps are cleanly hidden
+        // Hide ALL steps first — nuclear approach, no ambiguity
         document.querySelectorAll('.step').forEach(s => {
-            if (s !== nxt && s !== cur) {
-                s.style.display = 'none';
-                s.classList.remove('active');
-            }
+            s.classList.remove('active');
+            s.style.display = 'none';
+            s.style.opacity = '';
+            s.style.transform = '';
         });
 
-        if (cur && cur !== nxt) {
-            if (typeof gsap !== 'undefined') {
-                gsap.to(cur, {
-                    opacity: 0, y: -15, duration: 0.25, ease: 'power2.in',
-                    onComplete: () => {
-                        cur.classList.remove('active');
-                        cur.style.display = 'none';
-                        nxt.style.display = 'block';
-                        nxt.classList.add('active');
-                        gsap.fromTo(nxt, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                });
-            } else {
-                cur.classList.remove('active');
-                cur.style.display = 'none';
-                nxt.style.display = 'block';
-                nxt.classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        } else {
-            nxt.style.display = 'block';
-            nxt.classList.add('active');
-        }
-        
+        // Show only the target step with clean inline styles
+        nxt.style.display = 'block';
+        nxt.style.opacity = '1';
+        nxt.style.transform = 'none';
+        nxt.classList.add('active');
+
         currentStep = next;
-        
+
         // Update Progress Bar
-        const percent = Math.min(100, Math.round((currentStep / totalSteps) * 100));
+        const percent = Math.min(100, Math.round((Math.min(currentStep, totalSteps) / totalSteps) * 100));
         const barFill = document.getElementById('progress-bar-fill');
         if (barFill) barFill.style.width = percent + '%';
         const stepCounter = document.getElementById('step-counter');
@@ -746,7 +729,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const payAmt = document.getElementById('payment-amount');
             if (payAmt) payAmt.textContent = appData.cardType === 'premium' ? '₹1,499' : '₹999';
         }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
 
     // ════════════ Step 1: Aadhaar ════════════
     const aadhaarInput = document.getElementById('aadhaar-input');
@@ -790,7 +776,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch('/api/verify-aadhaar', { 
                     method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'same-origin',
                     body: JSON.stringify({aadhaar_number: raw}) 
                 });
             } catch (e) {
@@ -860,7 +847,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch('/api/verify-pan', { 
                     method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'same-origin',
                     body: JSON.stringify({pan_number: panNumber}) 
                 });
             } catch (e) {
@@ -985,7 +973,7 @@ document.addEventListener('DOMContentLoaded', () => {
             form.append('monthly_income', (incomeInput ? incomeInput.value.replace(/[^0-9]/g, '') : '') || '150000');
             
             try {
-                await fetch('/api/upload-statements', { method: 'POST', body: form });
+                await fetch('/api/upload-statements', { method: 'POST', body: form, credentials: 'same-origin' });
             } catch (e) {
                 console.log('Upload API note:', e);
             }
@@ -1080,7 +1068,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch('/api/select-card', { 
                     method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'same-origin',
                     body: JSON.stringify({card_type: appData.cardType, color: appData.cardColor}) 
                 });
             } catch (e) {
@@ -1151,7 +1140,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch('/api/process-payment', { 
                     method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'same-origin',
                     body: JSON.stringify({method}) 
                 });
             } catch (e) {
@@ -1236,7 +1226,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch('/api/save-address', { 
                     method: 'POST', 
-                    headers: {'Content-Type': 'application/json'}, 
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'same-origin',
                     body: JSON.stringify({line1: l1, apartment: apt, pincode: pin, city, state}) 
                 });
             } catch (e) {
