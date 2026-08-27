@@ -221,7 +221,8 @@ def verify_aadhaar():
     if not aadhaar or len(str(aadhaar)) != 12:
         return jsonify({'success': False, 'message': 'Please enter a valid 12-digit Aadhaar number'}), 400
 
-    time.sleep(0.8) # Deliberate demo processing state
+
+
     
     db = get_db()
     db.execute("""UPDATE users
@@ -239,7 +240,8 @@ def verify_pan():
     if not re.fullmatch(r'[A-Z]{5}[0-9]{4}[A-Z]', pan):
         return jsonify({'success': False, 'message': 'Invalid PAN format. Example: ABCDE1234F'}), 400
         
-    time.sleep(1.0)
+
+
     
     db = get_db()
     db.execute("UPDATE users SET pan_verified = 1, pan_number = ? WHERE id = ?", (f'{pan[:5]}XXXX{pan[-1]}', g.user['id']))

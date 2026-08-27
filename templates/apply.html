@@ -680,8 +680,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ultrablue: 'from-sky-400 via-sky-300 to-sky-500'
     };
 
+    const stepTitles = {
+        1: 'Aadhaar Verification', 2: 'PAN Card Verification', 3: 'Employment & Income',
+        4: 'Bank Statement Upload', 5: 'Select Card Tier', 6: 'Card Finish & Color',
+        7: 'Payment Confirmation', 8: 'Delivery Address', 9: 'Order Confirmed'
+    };
 
-    // Reset all steps to avoid layout interference
+    // ── CRITICAL: Reset inline styles set by app.js StepFlow.init() ──
     document.querySelectorAll('.step').forEach((s, idx) => {
         s.style.opacity = '';
         s.style.transform = '';
@@ -689,17 +694,25 @@ document.addEventListener('DOMContentLoaded', () => {
         s.classList.toggle('active', idx === 0);
     });
 
-    const stepTitles = {
-        1: 'Aadhaar Verification', 2: 'PAN Card Verification', 3: 'Employment & Income',
-        4: 'Bank Statement Upload', 5: 'Select Card Tier', 6: 'Card Finish & Color',
-        7: 'Payment Confirmation', 8: 'Delivery Address', 9: 'Order Confirmed'
-    };
+    // ── Helper: fire-and-forget API call ──
+    function fireAPI(url, data) {
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(data)
+        }).catch(() => {});
+    }
 
+    function fireFormAPI(url, formData) {
+        fetch(url, { method: 'POST', body: formData, credentials: 'same-origin' }).catch(() => {});
+    }
+
+    // ── Bulletproof step transition ──
     function goToStep(next) {
         const nxt = document.querySelector(`.step[data-step="${next}"]`);
         if (!nxt) return;
 
-        // Hide ALL steps first — nuclear approach, no ambiguity
         document.querySelectorAll('.step').forEach(s => {
             s.classList.remove('active');
             s.style.display = 'none';
@@ -707,7 +720,6 @@ document.addEventListener('DOMContentLoaded', () => {
             s.style.transform = '';
         });
 
-        // Show only the target step with clean inline styles
         nxt.style.display = 'block';
         nxt.style.opacity = '1';
         nxt.style.transform = 'none';
@@ -715,98 +727,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentStep = next;
 
-        // Update Progress Bar
         const percent = Math.min(100, Math.round((Math.min(currentStep, totalSteps) / totalSteps) * 100));
         const barFill = document.getElementById('progress-bar-fill');
         if (barFill) barFill.style.width = percent + '%';
         const stepCounter = document.getElementById('step-counter');
-        if (stepCounter) stepCounter.textContent = `Step ${Math.min(currentStep, 8)} of 8`;
+        if (stepCounter) stepCounter.textContent = 'Step ' + Math.min(currentStep, 8) + ' of 8';
         const stepEyebrow = document.getElementById('step-eyebrow');
         if (stepEyebrow) stepEyebrow.textContent = stepTitles[currentStep] || 'Card Application';
 
         if (currentStep === 6) setupColors();
         if (currentStep === 7) {
             const payAmt = document.getElementById('payment-amount');
-            if (payAmt) payAmt.textContent = appData.cardType === 'premium' ? '₹1,499' : '₹999';
+            if (payAmt) payAmt.textContent = appData.cardType === 'premium' ? '\u20b91,499' : '\u20b9999';
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-
-    // ════════════ Step 1: Aadhaar ════════════
+    // ══════════════ Step 1: Aadhaar ══════════════
     const aadhaarInput = document.getElementById('aadhaar-input');
     const aadhaarBtn = document.getElementById('btn-verify-aadhaar');
     const step1Badge = document.getElementById('step-1-badge');
     const step1Feedback = document.getElementById('step-1-feedback');
 
     if (aadhaarInput) {
-        aadhaarInput.addEventListener('input', e => { 
-            e.target.value = formatAadhaar(e.target.value); 
+        aadhaarInput.addEventListener('input', e => {
+            e.target.value = formatAadhaar(e.target.value);
         });
         aadhaarInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (aadhaarBtn) aadhaarBtn.click();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); if (aadhaarBtn) aadhaarBtn.click(); }
         });
     }
 
     if (aadhaarBtn) {
-        aadhaarBtn.addEventListener('click', async () => {
+        aadhaarBtn.addEventListener('click', () => {
+            if (aadhaarBtn.disabled) return;
             let raw = aadhaarInput ? aadhaarInput.value.replace(/\D/g, '') : '';
             if (!raw || raw.length < 12) {
                 raw = '889123456789';
                 if (aadhaarInput) aadhaarInput.value = formatAadhaar(raw);
             }
-            
+
             const cardBox = document.getElementById('card-step-1');
             if (cardBox) cardBox.classList.add('scanning');
-            
-            // Set loading button state
+
             aadhaarBtn.disabled = true;
-            aadhaarBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Verifying with UIDAI Servers...</span>
-            `;
+            aadhaarBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Verifying with UIDAI Servers...</span>';
 
-            try {
-                await fetch('/api/verify-aadhaar', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'same-origin',
-                    body: JSON.stringify({aadhaar_number: raw}) 
-                });
-            } catch (e) {
-                console.log('Aadhaar API note:', e);
-            }
+            // Fire API — do NOT await
+            fireAPI('/api/verify-aadhaar', { aadhaar_number: raw });
 
-            // Show verified state
+            // UI always progresses after 1.5s
             setTimeout(() => {
                 if (cardBox) cardBox.classList.remove('scanning');
-                if (step1Badge) {
-                    step1Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
-                }
-                if (step1Feedback) {
-                    step1Feedback.classList.remove('hidden');
-                }
+                if (step1Badge) step1Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
+                if (step1Feedback) step1Feedback.classList.remove('hidden');
                 aadhaarBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
-                aadhaarBtn.innerHTML = `
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    <span>Aadhaar Verified ✓</span>
-                `;
-
-                setTimeout(() => {
-                    goToStep(2);
-                }, 600);
-            }, 800);
+                aadhaarBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Aadhaar Verified \u2713</span>';
+                setTimeout(() => goToStep(2), 600);
+            }, 1500);
         });
     }
 
-    // ════════════ Step 2: PAN ════════════
+    // ══════════════ Step 2: PAN ══════════════
     const panInput = document.getElementById('pan-input');
     const panBtn = document.getElementById('btn-verify-pan');
     const step2Badge = document.getElementById('step-2-badge');
@@ -817,66 +800,41 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
         });
         panInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (panBtn) panBtn.click();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); if (panBtn) panBtn.click(); }
         });
     }
 
     if (panBtn) {
-        panBtn.addEventListener('click', async () => {
+        panBtn.addEventListener('click', () => {
+            if (panBtn.disabled) return;
             let panNumber = panInput ? panInput.value.trim().toUpperCase() : '';
             if (!validatePAN(panNumber)) {
                 panNumber = 'ABCDE1234F';
                 if (panInput) panInput.value = panNumber;
             }
-            
+
             const cardBox = document.getElementById('card-step-2');
             if (cardBox) cardBox.classList.add('scanning');
-            
+
             panBtn.disabled = true;
-            panBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Verifying PAN & CIBIL Bureau...</span>
-            `;
+            panBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Verifying PAN &amp; CIBIL Bureau...</span>';
 
-            try {
-                await fetch('/api/verify-pan', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'same-origin',
-                    body: JSON.stringify({pan_number: panNumber}) 
-                });
-            } catch (e) {
-                console.log('PAN API note:', e);
-            }
+            // Fire API — do NOT await
+            fireAPI('/api/verify-pan', { pan_number: panNumber });
 
+            // UI always progresses after 1.5s
             setTimeout(() => {
                 if (cardBox) cardBox.classList.remove('scanning');
-                if (step2Badge) {
-                    step2Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
-                }
-                if (step2Feedback) {
-                    step2Feedback.classList.remove('hidden');
-                }
+                if (step2Badge) step2Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
+                if (step2Feedback) step2Feedback.classList.remove('hidden');
                 panBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
-                panBtn.innerHTML = `
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    <span>PAN Verified ✓</span>
-                `;
-
-                setTimeout(() => {
-                    goToStep(3);
-                }, 600);
-            }, 800);
+                panBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>PAN Verified \u2713</span>';
+                setTimeout(() => goToStep(3), 600);
+            }, 1500);
         });
     }
 
-    // ════════════ Step 3: Financial (Salaried vs Business) ════════════
+    // ══════════════ Step 3: Financial (Salaried vs Business) ══════════════
     let selectedType = 'salaried';
     const salariedCard = document.querySelector('.income-type-card[data-type="salaried"]');
     if (salariedCard) salariedCard.classList.add('selected');
@@ -895,44 +853,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (incomeInput) {
         incomeInput.addEventListener('input', e => {
             let val = e.target.value.replace(/[^0-9]/g, '');
-            if (val) {
-                e.target.value = parseInt(val, 10).toLocaleString('en-IN');
-            } else {
-                e.target.value = '';
-            }
+            e.target.value = val ? parseInt(val, 10).toLocaleString('en-IN') : '';
         });
         incomeInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (financialBtn) financialBtn.click();
-            }
+            if (e.key === 'Enter') { e.preventDefault(); if (financialBtn) financialBtn.click(); }
         });
     }
 
     document.querySelectorAll('.income-chip').forEach(chip => {
         chip.addEventListener('click', () => {
-            const num = parseInt(chip.dataset.val, 10);
-            if (incomeInput) incomeInput.value = num.toLocaleString('en-IN');
+            if (incomeInput) incomeInput.value = parseInt(chip.dataset.val, 10).toLocaleString('en-IN');
         });
     });
 
     if (financialBtn) {
         financialBtn.addEventListener('click', () => {
-            if (incomeInput && !incomeInput.value) {
-                incomeInput.value = '1,50,000';
-            }
+            if (incomeInput && !incomeInput.value) incomeInput.value = '1,50,000';
+            financialBtn.disabled = true;
             financialBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
-            financialBtn.innerHTML = `
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                <span>Profile Saved ✓</span>
-            `;
-            setTimeout(() => {
-                goToStep(4);
-            }, 400);
+            financialBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Profile Saved \u2713</span>';
+            setTimeout(() => goToStep(4), 400);
         });
     }
 
-    // ════════════ Step 4: Bank Statement Upload ════════════
+    // ══════════════ Step 4: Bank Statement Upload ══════════════
     const statementInput = document.getElementById('statement-input');
     const statementBtn = document.getElementById('btn-submit-statement');
 
@@ -941,67 +885,46 @@ document.addEventListener('DOMContentLoaded', () => {
             if (statementInput.files[0]) {
                 document.getElementById('file-title').textContent = statementInput.files[0].name;
                 const sizeMB = (statementInput.files[0].size / (1024 * 1024)).toFixed(2);
-                document.getElementById('file-subtitle').textContent = `File Selected • ${sizeMB} MB`;
+                document.getElementById('file-subtitle').textContent = 'File Selected \u2022 ' + sizeMB + ' MB';
             }
         });
     }
 
     if (statementBtn) {
-        statementBtn.addEventListener('click', async () => {
-            if (!statementInput || !statementInput.files || !statementInput.files[0]) {
-                const blob = new Blob(["DEMO_BANK_STATEMENT_6_MONTHS_OK"], { type: 'application/pdf' });
-                const file = new File([blob], "bank_statement_6_months.pdf", { type: 'application/pdf' });
-                const dt = new DataTransfer();
-                dt.items.add(file);
-                if (statementInput) statementInput.files = dt.files;
-            }
-            
+        statementBtn.addEventListener('click', () => {
+            if (statementBtn.disabled) return;
+
             statementBtn.disabled = true;
-            statementBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Analyzing Turnover & Creditworthiness...</span>
-            `;
+            statementBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Analyzing Turnover & Creditworthiness...</span>';
 
             const form = new FormData();
-            if (statementInput && statementInput.files[0]) {
+            if (statementInput && statementInput.files && statementInput.files[0]) {
                 form.append('statement', statementInput.files[0]);
             }
             form.append('income_type', selectedType);
             form.append('monthly_income', (incomeInput ? incomeInput.value.replace(/[^0-9]/g, '') : '') || '150000');
-            
-            try {
-                await fetch('/api/upload-statements', { method: 'POST', body: form, credentials: 'same-origin' });
-            } catch (e) {
-                console.log('Upload API note:', e);
-            }
+
+            // Fire — do NOT await
+            fireFormAPI('/api/upload-statements', form);
 
             setTimeout(() => {
                 statementBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
-                statementBtn.innerHTML = `
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    <span>Pre-Approved ₹2,50,000 ✓</span>
-                `;
-                setTimeout(() => {
-                    goToStep(5);
-                }, 600);
-            }, 800);
+                statementBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Pre-Approved \u20b92,50,000 \u2713</span>';
+                setTimeout(() => goToStep(5), 600);
+            }, 1200);
         });
     }
 
-    // ════════════ Step 5: Card Selection ════════════
+    // ══════════════ Step 5: Card Selection ══════════════
     document.querySelectorAll('.btn-select-card').forEach(btn => {
-        btn.addEventListener('click', e => {
-            const cardTier = btn.dataset.card || 'premium';
-            appData.cardType = cardTier;
-            appData.cardColor = cardTier === 'premium' ? 'gold' : 'ultra';
+        btn.addEventListener('click', () => {
+            appData.cardType = btn.dataset.card || 'premium';
+            appData.cardColor = appData.cardType === 'premium' ? 'gold' : 'ultra';
             goToStep(6);
         });
     });
 
-    // ════════════ Step 6: Colors & Finish ════════════
+    // ══════════════ Step 6: Colors & Finish ══════════════
     const colorDefs = {
         premium: [
             { id: 'gold', name: 'Gold' },
@@ -1020,15 +943,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const preview = document.getElementById('preview-card');
         const label = document.getElementById('preview-color-label');
         const tierBadge = document.getElementById('preview-tier-badge');
-        
+
         if (!container || !preview) return;
-        
+
         container.innerHTML = '';
         appData.cardColor = opts[0].id;
-        
+
         const finishClass = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
-        preview.className = `relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ${finishClass} bg-gradient-to-br ${cardGradients[opts[0].id]} floating-anim`;
-        
+        preview.className = 'relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ' + finishClass + ' bg-gradient-to-br ' + cardGradients[opts[0].id] + ' floating-anim';
+
         if (label) label.textContent = opts[0].name;
         if (tierBadge) tierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
 
@@ -1039,15 +962,15 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.className = opt.id === appData.cardColor
                 ? 'px-5 py-2.5 rounded-full border-2 border-[#e35d12] bg-[#e35d12]/10 text-sm font-semibold text-[#e35d12] transition-all'
                 : 'px-5 py-2.5 rounded-full border-2 border-gray-200 text-sm font-medium text-gray-600 hover:border-gray-300 transition-all';
-            
+
             btn.addEventListener('click', () => {
                 container.querySelectorAll('button').forEach(b => {
                     b.className = 'px-5 py-2.5 rounded-full border-2 border-gray-200 text-sm font-medium text-gray-600 hover:border-gray-300 transition-all';
                 });
                 btn.className = 'px-5 py-2.5 rounded-full border-2 border-[#e35d12] bg-[#e35d12]/10 text-sm font-semibold text-[#e35d12] transition-all';
-                
+
                 appData.cardColor = opt.id;
-                preview.className = `relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ${finishClass} bg-gradient-to-br ${cardGradients[opt.id]} floating-anim`;
+                preview.className = 'relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ' + finishClass + ' bg-gradient-to-br ' + cardGradients[opt.id] + ' floating-anim';
                 if (label) label.textContent = opt.name;
             });
             container.appendChild(btn);
@@ -1056,32 +979,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const colorBtn = document.getElementById('btn-confirm-color');
     if (colorBtn) {
-        colorBtn.addEventListener('click', async () => {
+        colorBtn.addEventListener('click', () => {
+            if (colorBtn.disabled) return;
             colorBtn.disabled = true;
-            colorBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Configuring Metal Finish...</span>
-            `;
-            try {
-                await fetch('/api/select-card', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'same-origin',
-                    body: JSON.stringify({card_type: appData.cardType, color: appData.cardColor}) 
-                });
-            } catch (e) {
-                console.log('Select Card note:', e);
-            }
-            setTimeout(() => {
-                goToStep(7);
-            }, 400);
+            colorBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Configuring Metal Finish...</span>';
+
+            fireAPI('/api/select-card', { card_type: appData.cardType, color: appData.cardColor });
+
+            setTimeout(() => goToStep(7), 800);
         });
     }
 
-    // ════════════ Step 7: Payment Tabs & UPI Modes ════════════
+    // ══════════════ Step 7: Payment Tabs & UPI Modes ══════════════
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => {
@@ -1090,29 +999,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             btn.classList.add('text-[#e35d12]', 'bg-white', 'shadow-sm');
             btn.classList.remove('text-gray-500');
-            
+
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             const targetEl = document.getElementById(btn.dataset.target);
             if (targetEl) targetEl.classList.remove('hidden');
         });
     });
 
-    // UPI Mode Switcher (ID vs QR)
     document.querySelectorAll('.upi-mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.upi-mode-btn').forEach(b => {
                 b.className = 'upi-mode-btn py-2.5 px-4 rounded-xl border border-gray-200 text-gray-600 text-xs font-medium transition-all hover:border-gray-300';
             });
             btn.className = 'upi-mode-btn py-2.5 px-4 rounded-xl border-2 border-[#e35d12] bg-[#e35d12]/5 text-[#e35d12] text-xs font-bold transition-all';
-            
+
             const mode = btn.dataset.mode;
-            if (mode === 'id') {
-                document.getElementById('upi-id-box').classList.remove('hidden');
-                document.getElementById('upi-qr-box').classList.add('hidden');
-            } else {
-                document.getElementById('upi-id-box').classList.add('hidden');
-                document.getElementById('upi-qr-box').classList.remove('hidden');
-            }
+            document.getElementById('upi-id-box').classList.toggle('hidden', mode !== 'id');
+            document.getElementById('upi-qr-box').classList.toggle('hidden', mode !== 'qr');
         });
     });
 
@@ -1127,40 +1030,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('.btn-pay').forEach(btn => {
-        btn.addEventListener('click', async () => {
+        btn.addEventListener('click', () => {
+            if (btn.disabled) return;
             const method = btn.dataset.method || 'upi';
             btn.disabled = true;
-            btn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Authorizing Instant Payment...</span>
-            `;
-            try {
-                await fetch('/api/process-payment', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'same-origin',
-                    body: JSON.stringify({method}) 
-                });
-            } catch (e) {
-                console.log('Payment note:', e);
-            }
+            btn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Authorizing Instant Payment...</span>';
+
+            fireAPI('/api/process-payment', { method: method });
+
             setTimeout(() => {
                 btn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
-                btn.innerHTML = `
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    <span>Payment Confirmed ✓</span>
-                `;
-                setTimeout(() => {
-                    goToStep(8);
-                }, 600);
-            }, 800);
+                btn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Payment Confirmed \u2713</span>';
+                setTimeout(() => goToStep(8), 600);
+            }, 1200);
         });
     });
 
-    // ════════════ Step 8: Address ════════════
+    // ══════════════ Step 8: Address ══════════════
     const pincodeEl = document.getElementById('addr-pincode');
     const addrBtn = document.getElementById('btn-confirm-address');
 
@@ -1176,7 +1062,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (addrBtn) {
-        addrBtn.addEventListener('click', async () => {
+        addrBtn.addEventListener('click', () => {
+            if (addrBtn.disabled) return;
+
             const line1El = document.getElementById('addr-line1');
             const aptEl = document.getElementById('addr-apt');
             const pinEl = document.getElementById('addr-pincode');
@@ -1190,63 +1078,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const state = (stateEl ? stateEl.value.trim() : '') || 'Maharashtra';
 
             const finalAddrEl = document.getElementById('final-address');
-            if (finalAddrEl) {
-                finalAddrEl.textContent = `${apt ? apt + ', ' : ''}${l1}, ${city}, ${state} - ${pin}`;
-            }
-            
+            if (finalAddrEl) finalAddrEl.textContent = (apt ? apt + ', ' : '') + l1 + ', ' + city + ', ' + state + ' - ' + pin;
+
             const est = new Date();
             est.setDate(est.getDate() + 3);
             const finalDateEl = document.getElementById('final-date');
-            if (finalDateEl) {
-                finalDateEl.textContent = est.toLocaleDateString('en-IN', {
-                    weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
-                });
-            }
+            if (finalDateEl) finalDateEl.textContent = est.toLocaleDateString('en-IN', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
 
-            // Set final card visual
             const finalCard = document.getElementById('final-card');
             if (finalCard) {
-                const finishClass = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
-                finalCard.className = `w-full h-full rounded-2xl shadow-2xl relative floating-anim ${finishClass} bg-gradient-to-br ${cardGradients[appData.cardColor]}`;
+                const fc = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
+                finalCard.className = 'w-full h-full rounded-2xl shadow-2xl relative floating-anim ' + fc + ' bg-gradient-to-br ' + cardGradients[appData.cardColor];
             }
             const finalTierBadge = document.getElementById('final-tier-badge');
-            if (finalTierBadge) {
-                finalTierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
-            }
+            if (finalTierBadge) finalTierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
 
             addrBtn.disabled = true;
-            addrBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>Issuing Express Card Account...</span>
-            `;
+            addrBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Issuing Express Card Account...</span>';
 
-            try {
-                await fetch('/api/save-address', { 
-                    method: 'POST', 
-                    headers: {'Content-Type': 'application/json'},
-                    credentials: 'same-origin',
-                    body: JSON.stringify({line1: l1, apartment: apt, pincode: pin, city, state}) 
-                });
-            } catch (e) {
-                console.log('Address API note:', e);
-            }
+            fireAPI('/api/save-address', { line1: l1, apartment: apt, pincode: pin, city: city, state: state });
 
             setTimeout(() => {
                 addrBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
-                addrBtn.innerHTML = `
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    <span>Welcome Kit Dispatched ✓</span>
-                `;
+                addrBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Welcome Kit Dispatched \u2713</span>';
                 if (typeof showConfetti === 'function') showConfetti();
-                setTimeout(() => {
-                    goToStep(9);
-                }, 600);
-            }, 800);
+                setTimeout(() => goToStep(9), 600);
+            }, 1200);
         });
     }
 });
 </script>
 {% endblock %}
+
