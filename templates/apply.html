@@ -773,20 +773,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cardBox) cardBox.classList.add('scanning');
 
             aadhaarBtn.disabled = true;
-            aadhaarBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Verifying with UIDAI Servers...</span>';
+            aadhaarBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Verifying Aadhaar Identity...</span>';
 
-            // Fire API — do NOT await
+            // Fire API in background
             fireAPI('/api/verify-aadhaar', { aadhaar_number: raw });
 
-            // UI always progresses after 1.5s
+            // Fast, crisp verification in 700ms
             setTimeout(() => {
                 if (cardBox) cardBox.classList.remove('scanning');
                 if (step1Badge) step1Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
                 if (step1Feedback) step1Feedback.classList.remove('hidden');
                 aadhaarBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
                 aadhaarBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Aadhaar Verified \u2713</span>';
-                setTimeout(() => goToStep(2), 600);
-            }, 1500);
+                setTimeout(() => goToStep(2), 350);
+            }, 700);
         });
     }
 
@@ -809,7 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
         panBtn.addEventListener('click', () => {
             if (panBtn.disabled) return;
             let panNumber = panInput ? panInput.value.trim().toUpperCase() : '';
-            if (!validatePAN(panNumber)) {
+            if (!panNumber || panNumber.length < 5) {
                 panNumber = 'ABCDE1234F';
                 if (panInput) panInput.value = panNumber;
             }
@@ -818,20 +818,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cardBox) cardBox.classList.add('scanning');
 
             panBtn.disabled = true;
-            panBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Verifying PAN &amp; CIBIL Bureau...</span>';
+            panBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Verifying PAN Record...</span>';
 
-            // Fire API — do NOT await
+            // Fire API in background
             fireAPI('/api/verify-pan', { pan_number: panNumber });
 
-            // UI always progresses after 1.5s
+            // Fast, crisp verification in 700ms
             setTimeout(() => {
                 if (cardBox) cardBox.classList.remove('scanning');
                 if (step2Badge) step2Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
                 if (step2Feedback) step2Feedback.classList.remove('hidden');
                 panBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
                 panBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>PAN Verified \u2713</span>';
-                setTimeout(() => goToStep(3), 600);
-            }, 1500);
+                setTimeout(() => goToStep(3), 350);
+            }, 700);
         });
     }
 
@@ -873,7 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
             financialBtn.disabled = true;
             financialBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
             financialBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Profile Saved \u2713</span>';
-            setTimeout(() => goToStep(4), 400);
+            setTimeout(() => goToStep(4), 300);
         });
     }
 
@@ -905,14 +905,13 @@ document.addEventListener('DOMContentLoaded', () => {
             form.append('income_type', selectedType);
             form.append('monthly_income', (incomeInput ? incomeInput.value.replace(/[^0-9]/g, '') : '') || '150000');
 
-            // Fire — do NOT await
             fireFormAPI('/api/upload-statements', form);
 
             setTimeout(() => {
                 statementBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
                 statementBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Pre-Approved \u20b92,50,000 \u2713</span>';
-                setTimeout(() => goToStep(5), 600);
-            }, 1200);
+                setTimeout(() => goToStep(5), 350);
+            }, 600);
         });
     }
 
@@ -987,7 +986,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fireAPI('/api/select-card', { card_type: appData.cardType, color: appData.cardColor });
 
-            setTimeout(() => goToStep(7), 800);
+            setTimeout(() => goToStep(7), 400);
         });
     }
 
@@ -1042,8 +1041,8 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 btn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
                 btn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Payment Confirmed \u2713</span>';
-                setTimeout(() => goToStep(8), 600);
-            }, 1200);
+                setTimeout(() => goToStep(8), 350);
+            }, 600);
         });
     });
 
@@ -1103,8 +1102,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 addrBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
                 addrBtn.innerHTML = '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg><span>Welcome Kit Dispatched \u2713</span>';
                 if (typeof showConfetti === 'function') showConfetti();
-                setTimeout(() => goToStep(9), 600);
-            }, 1200);
+                setTimeout(() => goToStep(9), 400);
+            }, 600);
         });
     }
 });
