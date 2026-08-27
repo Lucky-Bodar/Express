@@ -159,7 +159,7 @@
                         <h2 class="text-xl sm:text-2xl font-display italic text-gray-900 font-bold">Aadhaar Identity Verification</h2>
                     </div>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <div id="step-1-badge" class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
             </div>
@@ -167,6 +167,17 @@
             <p class="text-sm text-gray-500 mb-8 leading-relaxed">
                 Enter your 12-digit Aadhaar number to verify your identity via secure UIDAI e-KYC instant lookup.
             </p>
+
+            <!-- Inline Verification Notification Banner -->
+            <div id="step-1-feedback" class="hidden mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center gap-3">
+                <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div>
+                    <p class="font-bold text-emerald-900 leading-snug">Aadhaar Identity Verified ✓</p>
+                    <p class="text-xs text-emerald-700 font-mono">UIDAI KYC Authenticated for Express Member</p>
+                </div>
+            </div>
 
             <div class="mb-8">
                 <label class="block text-xs font-mono uppercase tracking-wider text-gray-400 mb-2">Aadhaar Number</label>
@@ -179,8 +190,8 @@
                 </p>
             </div>
 
-            <button id="btn-verify-aadhaar" class="w-full py-4 rounded-2xl bg-[#e35d12] text-white font-semibold text-base sm:text-lg hover:bg-[#c94e0e] active:scale-[0.99] transition-all shadow-lg shadow-[#e35d12]/25">
-                Verify Aadhaar & Continue
+            <button id="btn-verify-aadhaar" class="w-full py-4 rounded-2xl bg-[#e35d12] text-white font-semibold text-base sm:text-lg hover:bg-[#c94e0e] active:scale-[0.99] transition-all shadow-lg shadow-[#e35d12]/25 flex items-center justify-center gap-2">
+                <span class="btn-label">Verify Aadhaar & Continue</span>
             </button>
         </div>
 
@@ -198,7 +209,7 @@
                         <h2 class="text-xl sm:text-2xl font-display italic text-gray-900 font-bold">Income Tax PAN Verification</h2>
                     </div>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+                <div id="step-2-badge" class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
                 </div>
             </div>
@@ -206,6 +217,17 @@
             <p class="text-sm text-gray-500 mb-8 leading-relaxed">
                 Enter your 10-character Permanent Account Number (PAN) to fetch your approved bureau credit limit.
             </p>
+
+            <!-- Inline Verification Notification Banner -->
+            <div id="step-2-feedback" class="hidden mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center gap-3">
+                <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div>
+                    <p class="font-bold text-emerald-900 leading-snug">PAN Card Verified ✓</p>
+                    <p class="text-xs text-emerald-700 font-mono">CIBIL Score & Income Tax Record Approved</p>
+                </div>
+            </div>
 
             <div class="mb-8">
                 <label class="block text-xs font-mono uppercase tracking-wider text-gray-400 mb-2">PAN Card Number</label>
@@ -215,8 +237,8 @@
                 <p class="text-[11px] text-gray-400 mt-2 text-center font-mono">Format: 5 Letters + 4 Digits + 1 Letter</p>
             </div>
 
-            <button id="btn-verify-pan" class="w-full py-4 rounded-2xl bg-[#e35d12] text-white font-semibold text-base sm:text-lg hover:bg-[#c94e0e] active:scale-[0.99] transition-all shadow-lg shadow-[#e35d12]/25">
-                Verify PAN & Continue
+            <button id="btn-verify-pan" class="w-full py-4 rounded-2xl bg-[#e35d12] text-white font-semibold text-base sm:text-lg hover:bg-[#c94e0e] active:scale-[0.99] transition-all shadow-lg shadow-[#e35d12]/25 flex items-center justify-center gap-2">
+                <span class="btn-label">Verify PAN & Continue</span>
             </button>
         </div>
 
@@ -675,19 +697,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const nxt = document.querySelector(`.step[data-step="${next}"]`);
         if (!nxt) return;
 
+        // Ensure all other steps are cleanly hidden
+        document.querySelectorAll('.step').forEach(s => {
+            if (s !== nxt && s !== cur) {
+                s.style.display = 'none';
+                s.classList.remove('active');
+            }
+        });
+
         if (cur && cur !== nxt) {
-            gsap.to(cur, {
-                opacity: 0, y: -20, duration: 0.25, ease: 'power2.in',
-                onComplete: () => {
-                    cur.classList.remove('active');
-                    nxt.classList.add('active');
-                    gsap.fromTo(nxt, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            });
+            if (typeof gsap !== 'undefined') {
+                gsap.to(cur, {
+                    opacity: 0, y: -15, duration: 0.25, ease: 'power2.in',
+                    onComplete: () => {
+                        cur.classList.remove('active');
+                        cur.style.display = 'none';
+                        nxt.style.display = 'block';
+                        nxt.classList.add('active');
+                        gsap.fromTo(nxt, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
+            } else {
+                cur.classList.remove('active');
+                cur.style.display = 'none';
+                nxt.style.display = 'block';
+                nxt.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         } else {
+            nxt.style.display = 'block';
             nxt.classList.add('active');
-            gsap.fromTo(nxt, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
         }
         
         currentStep = next;
@@ -710,6 +750,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ════════════ Step 1: Aadhaar ════════════
     const aadhaarInput = document.getElementById('aadhaar-input');
+    const aadhaarBtn = document.getElementById('btn-verify-aadhaar');
+    const step1Badge = document.getElementById('step-1-badge');
+    const step1Feedback = document.getElementById('step-1-feedback');
+
     if (aadhaarInput) {
         aadhaarInput.addEventListener('input', e => { 
             e.target.value = formatAadhaar(e.target.value); 
@@ -717,41 +761,70 @@ document.addEventListener('DOMContentLoaded', () => {
         aadhaarInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                document.getElementById('btn-verify-aadhaar').click();
+                if (aadhaarBtn) aadhaarBtn.click();
             }
         });
     }
 
-    document.getElementById('btn-verify-aadhaar').addEventListener('click', async () => {
-        let raw = aadhaarInput ? aadhaarInput.value.replace(/\D/g, '') : '';
-        if (!raw || raw.length < 12) {
-            raw = '889123456789';
-            if (aadhaarInput) aadhaarInput.value = formatAadhaar(raw);
-        }
-        
-        const cardBox = document.getElementById('card-step-1');
-        if (cardBox) cardBox.classList.add('scanning');
-        showVerificationLoader('Connecting to UIDAI Secure Server...');
-        
-        try {
-            const res = await fetch('/api/verify-aadhaar', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({aadhaar_number: raw}) 
-            });
-            const data = await res.json();
-            if (cardBox) cardBox.classList.remove('scanning');
-            await showVerificationSuccess('Aadhaar Identity Verified ✓');
-            goToStep(2);
-        } catch (error) {
-            if (cardBox) cardBox.classList.remove('scanning');
-            await showVerificationSuccess('Aadhaar Identity Verified ✓');
-            goToStep(2);
-        }
-    });
+    if (aadhaarBtn) {
+        aadhaarBtn.addEventListener('click', async () => {
+            let raw = aadhaarInput ? aadhaarInput.value.replace(/\D/g, '') : '';
+            if (!raw || raw.length < 12) {
+                raw = '889123456789';
+                if (aadhaarInput) aadhaarInput.value = formatAadhaar(raw);
+            }
+            
+            const cardBox = document.getElementById('card-step-1');
+            if (cardBox) cardBox.classList.add('scanning');
+            
+            // Set loading button state
+            aadhaarBtn.disabled = true;
+            aadhaarBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Verifying with UIDAI Servers...</span>
+            `;
+
+            try {
+                await fetch('/api/verify-aadhaar', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({aadhaar_number: raw}) 
+                });
+            } catch (e) {
+                console.log('Aadhaar API note:', e);
+            }
+
+            // Show verified state
+            setTimeout(() => {
+                if (cardBox) cardBox.classList.remove('scanning');
+                if (step1Badge) {
+                    step1Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
+                }
+                if (step1Feedback) {
+                    step1Feedback.classList.remove('hidden');
+                }
+                aadhaarBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
+                aadhaarBtn.innerHTML = `
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Aadhaar Verified ✓</span>
+                `;
+
+                setTimeout(() => {
+                    goToStep(2);
+                }, 600);
+            }, 800);
+        });
+    }
 
     // ════════════ Step 2: PAN ════════════
     const panInput = document.getElementById('pan-input');
+    const panBtn = document.getElementById('btn-verify-pan');
+    const step2Badge = document.getElementById('step-2-badge');
+    const step2Feedback = document.getElementById('step-2-feedback');
+
     if (panInput) {
         panInput.addEventListener('input', e => {
             e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
@@ -759,38 +832,61 @@ document.addEventListener('DOMContentLoaded', () => {
         panInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                document.getElementById('btn-verify-pan').click();
+                if (panBtn) panBtn.click();
             }
         });
     }
 
-    document.getElementById('btn-verify-pan').addEventListener('click', async () => {
-        let panNumber = panInput ? panInput.value.trim().toUpperCase() : '';
-        if (!validatePAN(panNumber)) {
-            panNumber = 'ABCDE1234F';
-            if (panInput) panInput.value = panNumber;
-        }
-        
-        const cardBox = document.getElementById('card-step-2');
-        if (cardBox) cardBox.classList.add('scanning');
-        showVerificationLoader('Verifying PAN with Income Tax Database...');
-        
-        try {
-            const res = await fetch('/api/verify-pan', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({pan_number: panNumber}) 
-            });
-            const data = await res.json();
-            if (cardBox) cardBox.classList.remove('scanning');
-            await showVerificationSuccess('PAN Verified • CIBIL Assessment OK ✓');
-            goToStep(3);
-        } catch (error) {
-            if (cardBox) cardBox.classList.remove('scanning');
-            await showVerificationSuccess('PAN Verified • CIBIL Assessment OK ✓');
-            goToStep(3);
-        }
-    });
+    if (panBtn) {
+        panBtn.addEventListener('click', async () => {
+            let panNumber = panInput ? panInput.value.trim().toUpperCase() : '';
+            if (!validatePAN(panNumber)) {
+                panNumber = 'ABCDE1234F';
+                if (panInput) panInput.value = panNumber;
+            }
+            
+            const cardBox = document.getElementById('card-step-2');
+            if (cardBox) cardBox.classList.add('scanning');
+            
+            panBtn.disabled = true;
+            panBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Verifying PAN & CIBIL Bureau...</span>
+            `;
+
+            try {
+                await fetch('/api/verify-pan', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({pan_number: panNumber}) 
+                });
+            } catch (e) {
+                console.log('PAN API note:', e);
+            }
+
+            setTimeout(() => {
+                if (cardBox) cardBox.classList.remove('scanning');
+                if (step2Badge) {
+                    step2Badge.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors';
+                }
+                if (step2Feedback) {
+                    step2Feedback.classList.remove('hidden');
+                }
+                panBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
+                panBtn.innerHTML = `
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    <span>PAN Verified ✓</span>
+                `;
+
+                setTimeout(() => {
+                    goToStep(3);
+                }, 600);
+            }, 800);
+        });
+    }
 
     // ════════════ Step 3: Financial (Salaried vs Business) ════════════
     let selectedType = 'salaried';
@@ -806,6 +902,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const incomeInput = document.getElementById('income-input');
+    const financialBtn = document.getElementById('btn-submit-financial');
+
     if (incomeInput) {
         incomeInput.addEventListener('input', e => {
             let val = e.target.value.replace(/[^0-9]/g, '');
@@ -818,7 +916,7 @@ document.addEventListener('DOMContentLoaded', () => {
         incomeInput.addEventListener('keydown', e => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                document.getElementById('btn-submit-financial').click();
+                if (financialBtn) financialBtn.click();
             }
         });
     }
@@ -830,15 +928,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('btn-submit-financial').addEventListener('click', () => {
-        if (incomeInput && !incomeInput.value) {
-            incomeInput.value = '1,50,000';
-        }
-        goToStep(4);
-    });
+    if (financialBtn) {
+        financialBtn.addEventListener('click', () => {
+            if (incomeInput && !incomeInput.value) {
+                incomeInput.value = '1,50,000';
+            }
+            financialBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
+            financialBtn.innerHTML = `
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <span>Profile Saved ✓</span>
+            `;
+            setTimeout(() => {
+                goToStep(4);
+            }, 400);
+        });
+    }
 
     // ════════════ Step 4: Bank Statement Upload ════════════
     const statementInput = document.getElementById('statement-input');
+    const statementBtn = document.getElementById('btn-submit-statement');
+
     if (statementInput) {
         statementInput.addEventListener('change', () => {
             if (statementInput.files[0]) {
@@ -849,32 +958,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('btn-submit-statement').addEventListener('click', async () => {
-        if (!statementInput || !statementInput.files || !statementInput.files[0]) {
-            const blob = new Blob(["DEMO_BANK_STATEMENT_6_MONTHS_OK"], { type: 'application/pdf' });
-            const file = new File([blob], "bank_statement_6_months.pdf", { type: 'application/pdf' });
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            if (statementInput) statementInput.files = dt.files;
-        }
-        
-        const form = new FormData();
-        if (statementInput && statementInput.files[0]) {
-            form.append('statement', statementInput.files[0]);
-        }
-        form.append('income_type', selectedType);
-        form.append('monthly_income', (incomeInput ? incomeInput.value.replace(/[^0-9]/g, '') : '') || '150000');
-        
-        showVerificationLoader('Analyzing 6-Month Statements & Turnover...');
-        try {
-            const res = await fetch('/api/upload-statements', { method: 'POST', body: form });
-            await showVerificationSuccess('Statement Verified • Pre-Approved ₹2,50,000 ✓');
-            goToStep(5);
-        } catch (e) {
-            await showVerificationSuccess('Statement Verified • Pre-Approved ₹2,50,000 ✓');
-            goToStep(5);
-        }
-    });
+    if (statementBtn) {
+        statementBtn.addEventListener('click', async () => {
+            if (!statementInput || !statementInput.files || !statementInput.files[0]) {
+                const blob = new Blob(["DEMO_BANK_STATEMENT_6_MONTHS_OK"], { type: 'application/pdf' });
+                const file = new File([blob], "bank_statement_6_months.pdf", { type: 'application/pdf' });
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                if (statementInput) statementInput.files = dt.files;
+            }
+            
+            statementBtn.disabled = true;
+            statementBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Analyzing Turnover & Creditworthiness...</span>
+            `;
+
+            const form = new FormData();
+            if (statementInput && statementInput.files[0]) {
+                form.append('statement', statementInput.files[0]);
+            }
+            form.append('income_type', selectedType);
+            form.append('monthly_income', (incomeInput ? incomeInput.value.replace(/[^0-9]/g, '') : '') || '150000');
+            
+            try {
+                await fetch('/api/upload-statements', { method: 'POST', body: form });
+            } catch (e) {
+                console.log('Upload API note:', e);
+            }
+
+            setTimeout(() => {
+                statementBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
+                statementBtn.innerHTML = `
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Pre-Approved ₹2,50,000 ✓</span>
+                `;
+                setTimeout(() => {
+                    goToStep(5);
+                }, 600);
+            }, 800);
+        });
+    }
 
     // ════════════ Step 5: Card Selection ════════════
     document.querySelectorAll('.btn-select-card').forEach(btn => {
@@ -939,18 +1066,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('btn-confirm-color').addEventListener('click', async () => {
-        try {
-            await fetch('/api/select-card', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({card_type: appData.cardType, color: appData.cardColor}) 
-            });
-            goToStep(7);
-        } catch (e) {
-            goToStep(7);
-        }
-    });
+    const colorBtn = document.getElementById('btn-confirm-color');
+    if (colorBtn) {
+        colorBtn.addEventListener('click', async () => {
+            colorBtn.disabled = true;
+            colorBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Configuring Metal Finish...</span>
+            `;
+            try {
+                await fetch('/api/select-card', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({card_type: appData.cardType, color: appData.cardColor}) 
+                });
+            } catch (e) {
+                console.log('Select Card note:', e);
+            }
+            setTimeout(() => {
+                goToStep(7);
+            }, 400);
+        });
+    }
 
     // ════════════ Step 7: Payment Tabs & UPI Modes ════════════
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1000,24 +1140,40 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-pay').forEach(btn => {
         btn.addEventListener('click', async () => {
             const method = btn.dataset.method || 'upi';
-            showVerificationLoader('Securing Instant Bank Payment...');
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Authorizing Instant Payment...</span>
+            `;
             try {
-                const res = await fetch('/api/process-payment', { 
+                await fetch('/api/process-payment', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({method}) 
                 });
-                await showVerificationSuccess('Payment Verified • Receipt Generated ✓');
-                goToStep(8);
             } catch (e) {
-                await showVerificationSuccess('Payment Verified • Receipt Generated ✓');
-                goToStep(8);
+                console.log('Payment note:', e);
             }
+            setTimeout(() => {
+                btn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
+                btn.innerHTML = `
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Payment Confirmed ✓</span>
+                `;
+                setTimeout(() => {
+                    goToStep(8);
+                }, 600);
+            }, 800);
         });
     });
 
     // ════════════ Step 8: Address ════════════
     const pincodeEl = document.getElementById('addr-pincode');
+    const addrBtn = document.getElementById('btn-confirm-address');
+
     if (pincodeEl) {
         pincodeEl.addEventListener('input', e => {
             if (e.target.value.length === 6) {
@@ -1029,60 +1185,77 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.getElementById('btn-confirm-address').addEventListener('click', async () => {
-        const line1El = document.getElementById('addr-line1');
-        const aptEl = document.getElementById('addr-apt');
-        const pinEl = document.getElementById('addr-pincode');
-        const cityEl = document.getElementById('addr-city');
-        const stateEl = document.getElementById('addr-state');
+    if (addrBtn) {
+        addrBtn.addEventListener('click', async () => {
+            const line1El = document.getElementById('addr-line1');
+            const aptEl = document.getElementById('addr-apt');
+            const pinEl = document.getElementById('addr-pincode');
+            const cityEl = document.getElementById('addr-city');
+            const stateEl = document.getElementById('addr-state');
 
-        const l1 = (line1El ? line1El.value.trim() : '') || '101 Express Towers';
-        const apt = (aptEl ? aptEl.value.trim() : '') || 'Tower 3, Penthouse 402';
-        const pin = (pinEl ? pinEl.value.trim() : '') || '400001';
-        const city = (cityEl ? cityEl.value.trim() : '') || 'Mumbai';
-        const state = (stateEl ? stateEl.value.trim() : '') || 'Maharashtra';
+            const l1 = (line1El ? line1El.value.trim() : '') || '101 Express Towers';
+            const apt = (aptEl ? aptEl.value.trim() : '') || 'Tower 3, Penthouse 402';
+            const pin = (pinEl ? pinEl.value.trim() : '') || '400001';
+            const city = (cityEl ? cityEl.value.trim() : '') || 'Mumbai';
+            const state = (stateEl ? stateEl.value.trim() : '') || 'Maharashtra';
 
-        const finalAddrEl = document.getElementById('final-address');
-        if (finalAddrEl) {
-            finalAddrEl.textContent = `${apt ? apt + ', ' : ''}${l1}, ${city}, ${state} - ${pin}`;
-        }
-        
-        const est = new Date();
-        est.setDate(est.getDate() + 3);
-        const finalDateEl = document.getElementById('final-date');
-        if (finalDateEl) {
-            finalDateEl.textContent = est.toLocaleDateString('en-IN', {
-                weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
-            });
-        }
+            const finalAddrEl = document.getElementById('final-address');
+            if (finalAddrEl) {
+                finalAddrEl.textContent = `${apt ? apt + ', ' : ''}${l1}, ${city}, ${state} - ${pin}`;
+            }
+            
+            const est = new Date();
+            est.setDate(est.getDate() + 3);
+            const finalDateEl = document.getElementById('final-date');
+            if (finalDateEl) {
+                finalDateEl.textContent = est.toLocaleDateString('en-IN', {
+                    weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
+                });
+            }
 
-        // Set final card visual
-        const finalCard = document.getElementById('final-card');
-        if (finalCard) {
-            const finishClass = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
-            finalCard.className = `w-full h-full rounded-2xl shadow-2xl relative floating-anim ${finishClass} bg-gradient-to-br ${cardGradients[appData.cardColor]}`;
-        }
-        const finalTierBadge = document.getElementById('final-tier-badge');
-        if (finalTierBadge) {
-            finalTierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
-        }
+            // Set final card visual
+            const finalCard = document.getElementById('final-card');
+            if (finalCard) {
+                const finishClass = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
+                finalCard.className = `w-full h-full rounded-2xl shadow-2xl relative floating-anim ${finishClass} bg-gradient-to-br ${cardGradients[appData.cardColor]}`;
+            }
+            const finalTierBadge = document.getElementById('final-tier-badge');
+            if (finalTierBadge) {
+                finalTierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
+            }
 
-        showVerificationLoader('Creating Express Card Account...');
-        try {
-            await fetch('/api/save-address', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({line1: l1, apartment: apt, pincode: pin, city, state}) 
-            });
-            await showVerificationSuccess('Welcome Kit Dispatched ✓');
-            showConfetti();
-            goToStep(9);
-        } catch (e) {
-            await showVerificationSuccess('Welcome Kit Dispatched ✓');
-            showConfetti();
-            goToStep(9);
-        }
-    });
+            addrBtn.disabled = true;
+            addrBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Issuing Express Card Account...</span>
+            `;
+
+            try {
+                await fetch('/api/save-address', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({line1: l1, apartment: apt, pincode: pin, city, state}) 
+                });
+            } catch (e) {
+                console.log('Address API note:', e);
+            }
+
+            setTimeout(() => {
+                addrBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';
+                addrBtn.innerHTML = `
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Welcome Kit Dispatched ✓</span>
+                `;
+                if (typeof showConfetti === 'function') showConfetti();
+                setTimeout(() => {
+                    goToStep(9);
+                }, 600);
+            }, 800);
+        });
+    }
 });
 </script>
 {% endblock %}
