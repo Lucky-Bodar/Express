@@ -1,42 +1,20 @@
 // Helper functions for the apply page
 
 function formatAadhaar(value) {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,12}/g);
-    const match = matches && matches[0] || '';
-    const parts = [];
-
-    for (let i = 0, len = match.length; i < len; i += 4) {
-        parts.push(match.substring(i, i + 4));
-    }
-
-    if (parts.length) {
-        return parts.join(' ');
-    } else {
-        return value;
-    }
+    const clean = (value || '').replace(/\D/g, '').slice(0, 12);
+    const parts = clean.match(/.{1,4}/g);
+    return parts ? parts.join(' ') : clean;
 }
 
 function validatePAN(value) {
     const regex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    return regex.test(value.toUpperCase());
+    return regex.test((value || '').toUpperCase().trim());
 }
 
 function formatCardNumber(value) {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
-    const parts = [];
-
-    for (let i = 0, len = match.length; i < len; i += 4) {
-        parts.push(match.substring(i, i + 4));
-    }
-
-    if (parts.length) {
-        return parts.join(' ');
-    } else {
-        return value;
-    }
+    const clean = (value || '').replace(/\D/g, '').slice(0, 16);
+    const parts = clean.match(/.{1,4}/g);
+    return parts ? parts.join(' ') : clean;
 }
 
 function showConfetti() {
