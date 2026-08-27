@@ -113,6 +113,14 @@ def init_db():
             )
         ''')
         
+        # Ensure default demo user exists
+        user_count = cursor.execute('SELECT COUNT(*) FROM users').fetchone()[0]
+        if user_count == 0:
+            cursor.execute('''
+                INSERT INTO users (phone, name, dob, age, session_token, aadhaar_verified, pan_verified)
+                VALUES ('9876543210', 'Express Member', '1998-05-15', 28, 'demo-session-token-express', 0, 0)
+            ''')
+
         db.commit()
 
 def get_user_by_phone(phone):

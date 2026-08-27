@@ -35,11 +35,12 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #e35d12, #ffaa00, transparent);
-        box-shadow: 0 0 15px #e35d12;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, #ff3b00, #ffaa00, #ff3b00, transparent);
+        box-shadow: 0 0 20px 4px rgba(255, 69, 0, 0.9), 0 0 8px 2px rgba(255, 170, 0, 0.9);
         opacity: 0;
         pointer-events: none;
+        z-index: 30;
     }
 
     @keyframes laserScan {
@@ -50,7 +51,7 @@
 
     .scanning .laser-scanner {
         opacity: 1;
-        animation: laserScan 2s ease-in-out infinite;
+        animation: laserScan 1.2s ease-in-out infinite;
     }
 
     .income-type-card {
