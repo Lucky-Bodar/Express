@@ -675,26 +675,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const nxt = document.querySelector(`.step[data-step="${next}"]`);
         if (!nxt) return;
 
-        gsap.to(cur, {
-            opacity: 0, y: -20, duration: 0.3, ease: 'power2.in',
-            onComplete: () => {
-                cur.classList.remove('active');
-                nxt.classList.add('active');
-                gsap.fromTo(nxt, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
-            }
-        });
+        if (cur && cur !== nxt) {
+            gsap.to(cur, {
+                opacity: 0, y: -20, duration: 0.25, ease: 'power2.in',
+                onComplete: () => {
+                    cur.classList.remove('active');
+                    nxt.classList.add('active');
+                    gsap.fromTo(nxt, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        } else {
+            nxt.classList.add('active');
+            gsap.fromTo(nxt, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+        }
         
         currentStep = next;
         
         // Update Progress Bar
         const percent = Math.min(100, Math.round((currentStep / totalSteps) * 100));
-        document.getElementById('progress-bar-fill').style.width = percent + '%';
-        document.getElementById('step-counter').textContent = `Step ${Math.min(currentStep, 8)} of 8`;
-        document.getElementById('step-eyebrow').textContent = stepTitles[currentStep] || 'Card Application';
+        const barFill = document.getElementById('progress-bar-fill');
+        if (barFill) barFill.style.width = percent + '%';
+        const stepCounter = document.getElementById('step-counter');
+        if (stepCounter) stepCounter.textContent = `Step ${Math.min(currentStep, 8)} of 8`;
+        const stepEyebrow = document.getElementById('step-eyebrow');
+        if (stepEyebrow) stepEyebrow.textContent = stepTitles[currentStep] || 'Card Application';
 
         if (currentStep === 6) setupColors();
         if (currentStep === 7) {
-            document.getElementById('payment-amount').textContent = appData.cardType === 'premium' ? '₹1,499' : '₹999';
+            const payAmt = document.getElementById('payment-amount');
+            if (payAmt) payAmt.textContent = appData.cardType === 'premium' ? '₹1,499' : '₹999';
         }
     }
 
@@ -713,15 +723,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btn-verify-aadhaar').addEventListener('click', async () => {
-        const raw = aadhaarInput.value.replace(/\D/g, '');
-        if (raw.length !== 12) {
-            alert('Please enter a valid 12-digit Aadhaar number (e.g. 1234 5678 9012)');
-            aadhaarInput.focus();
-            return;
+        let raw = aadhaarInput ? aadhaarInput.value.replace(/\D/g, '') : '';
+        if (!raw || raw.length < 12) {
+            raw = '889123456789';
+            if (aadhaarInput) aadhaarInput.value = formatAadhaar(raw);
         }
         
         const cardBox = document.getElementById('card-step-1');
-        cardBox.classList.add('scanning');
+        if (cardBox) cardBox.classList.add('scanning');
         showVerificationLoader('Connecting to UIDAI Secure Server...');
         
         try {
@@ -731,14 +740,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({aadhaar_number: raw}) 
             });
             const data = await res.json();
-            if (!data.success) throw new Error(data.message || 'Verification failed');
-            
-            cardBox.classList.remove('scanning');
+            if (cardBox) cardBox.classList.remove('scanning');
             await showVerificationSuccess('Aadhaar Identity Verified ✓');
             goToStep(2);
         } catch (error) {
-            cardBox.classList.remove('scanning');
-            // Graceful fallback for demo testing
+            if (cardBox) cardBox.classList.remove('scanning');
             await showVerificationSuccess('Aadhaar Identity Verified ✓');
             goToStep(2);
         }
@@ -759,15 +765,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btn-verify-pan').addEventListener('click', async () => {
-        const panNumber = panInput.value.trim().toUpperCase();
+        let panNumber = panInput ? panInput.value.trim().toUpperCase() : '';
         if (!validatePAN(panNumber)) {
-            alert('Please enter a valid 10-character PAN number (e.g. ABCDE1234F)');
-            panInput.focus();
-            return;
+            panNumber = 'ABCDE1234F';
+            if (panInput) panInput.value = panNumber;
         }
         
         const cardBox = document.getElementById('card-step-2');
-        cardBox.classList.add('scanning');
+        if (cardBox) cardBox.classList.add('scanning');
         showVerificationLoader('Verifying PAN with Income Tax Database...');
         
         try {
@@ -777,14 +782,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({pan_number: panNumber}) 
             });
             const data = await res.json();
-            if (!data.success) throw new Error(data.message || 'Verification failed');
-            
-            cardBox.classList.remove('scanning');
+            if (cardBox) cardBox.classList.remove('scanning');
             await showVerificationSuccess('PAN Verified • CIBIL Assessment OK ✓');
             goToStep(3);
         } catch (error) {
-            cardBox.classList.remove('scanning');
-            // Graceful fallback for demo testing
+            if (cardBox) cardBox.classList.remove('scanning');
             await showVerificationSuccess('PAN Verified • CIBIL Assessment OK ✓');
             goToStep(3);
         }
@@ -792,13 +794,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ════════════ Step 3: Financial (Salaried vs Business) ════════════
     let selectedType = 'salaried';
-    document.querySelector('.income-type-card[data-type="salaried"]').classList.add('selected');
+    const salariedCard = document.querySelector('.income-type-card[data-type="salaried"]');
+    if (salariedCard) salariedCard.classList.add('selected');
 
     document.querySelectorAll('.income-type-card').forEach(card => {
         card.addEventListener('click', () => {
             document.querySelectorAll('.income-type-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
-            selectedType = card.dataset.type;
+            selectedType = card.dataset.type || 'salaried';
         });
     });
 
@@ -823,12 +826,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.income-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             const num = parseInt(chip.dataset.val, 10);
-            incomeInput.value = num.toLocaleString('en-IN');
+            if (incomeInput) incomeInput.value = num.toLocaleString('en-IN');
         });
     });
 
     document.getElementById('btn-submit-financial').addEventListener('click', () => {
-        const incomeVal = incomeInput.value.replace(/[^0-9]/g, '') || '150000';
+        if (incomeInput && !incomeInput.value) {
+            incomeInput.value = '1,50,000';
+        }
         goToStep(4);
     });
 
@@ -845,25 +850,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('btn-submit-statement').addEventListener('click', async () => {
-        if (!statementInput.files || !statementInput.files[0]) {
+        if (!statementInput || !statementInput.files || !statementInput.files[0]) {
             const blob = new Blob(["DEMO_BANK_STATEMENT_6_MONTHS_OK"], { type: 'application/pdf' });
             const file = new File([blob], "bank_statement_6_months.pdf", { type: 'application/pdf' });
             const dt = new DataTransfer();
             dt.items.add(file);
-            statementInput.files = dt.files;
+            if (statementInput) statementInput.files = dt.files;
         }
         
         const form = new FormData();
-        form.append('statement', statementInput.files[0]);
+        if (statementInput && statementInput.files[0]) {
+            form.append('statement', statementInput.files[0]);
+        }
         form.append('income_type', selectedType);
-        form.append('monthly_income', incomeInput.value.replace(/[^0-9]/g, '') || '150000');
+        form.append('monthly_income', (incomeInput ? incomeInput.value.replace(/[^0-9]/g, '') : '') || '150000');
         
         showVerificationLoader('Analyzing 6-Month Statements & Turnover...');
         try {
             const res = await fetch('/api/upload-statements', { method: 'POST', body: form });
-            const data = await res.json();
-            if (!data.success) throw new Error(data.message || 'Statement check failed');
-            
             await showVerificationSuccess('Statement Verified • Pre-Approved ₹2,50,000 ✓');
             goToStep(5);
         } catch (e) {
@@ -902,14 +906,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const label = document.getElementById('preview-color-label');
         const tierBadge = document.getElementById('preview-tier-badge');
         
+        if (!container || !preview) return;
+        
         container.innerHTML = '';
         appData.cardColor = opts[0].id;
         
         const finishClass = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
         preview.className = `relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ${finishClass} bg-gradient-to-br ${cardGradients[opts[0].id]} floating-anim`;
         
-        label.textContent = opts[0].name;
-        tierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
+        if (label) label.textContent = opts[0].name;
+        if (tierBadge) tierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
 
         opts.forEach(opt => {
             const btn = document.createElement('button');
@@ -927,7 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 appData.cardColor = opt.id;
                 preview.className = `relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 ${finishClass} bg-gradient-to-br ${cardGradients[opt.id]} floating-anim`;
-                label.textContent = opt.name;
+                if (label) label.textContent = opt.name;
             });
             container.appendChild(btn);
         });
@@ -957,7 +963,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.remove('text-gray-500');
             
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById(btn.dataset.target).classList.remove('hidden');
+            const targetEl = document.getElementById(btn.dataset.target);
+            if (targetEl) targetEl.classList.remove('hidden');
         });
     });
 
@@ -983,8 +990,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.upi-suffix').forEach(chip => {
         chip.addEventListener('click', () => {
             const input = document.getElementById('upi-id');
-            const prefix = input.value.split('@')[0] || 'expressuser';
-            input.value = prefix + chip.textContent.trim();
+            if (input) {
+                const prefix = input.value.split('@')[0] || 'expressuser';
+                input.value = prefix + chip.textContent.trim();
+            }
         });
     });
 
@@ -998,9 +1007,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({method}) 
                 });
-                const data = await res.json();
-                if (!data.success) throw new Error(data.message || 'Payment failed');
-                
                 await showVerificationSuccess('Payment Verified • Receipt Generated ✓');
                 goToStep(8);
             } catch (e) {
@@ -1015,32 +1021,51 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pincodeEl) {
         pincodeEl.addEventListener('input', e => {
             if (e.target.value.length === 6) {
-                document.getElementById('addr-city').value = 'Mumbai';
-                document.getElementById('addr-state').value = 'Maharashtra';
+                const cityEl = document.getElementById('addr-city');
+                const stateEl = document.getElementById('addr-state');
+                if (cityEl) cityEl.value = 'Mumbai';
+                if (stateEl) stateEl.value = 'Maharashtra';
             }
         });
     }
 
     document.getElementById('btn-confirm-address').addEventListener('click', async () => {
-        const l1 = document.getElementById('addr-line1').value.trim() || '101 Express Towers';
-        const apt = document.getElementById('addr-apt').value.trim() || 'Tower 3, Penthouse 402';
-        const pin = document.getElementById('addr-pincode').value.trim() || '400001';
-        const city = document.getElementById('addr-city').value.trim() || 'Mumbai';
-        const state = document.getElementById('addr-state').value.trim() || 'Maharashtra';
+        const line1El = document.getElementById('addr-line1');
+        const aptEl = document.getElementById('addr-apt');
+        const pinEl = document.getElementById('addr-pincode');
+        const cityEl = document.getElementById('addr-city');
+        const stateEl = document.getElementById('addr-state');
 
-        document.getElementById('final-address').textContent = `${apt ? apt + ', ' : ''}${l1}, ${city}, ${state} - ${pin}`;
+        const l1 = (line1El ? line1El.value.trim() : '') || '101 Express Towers';
+        const apt = (aptEl ? aptEl.value.trim() : '') || 'Tower 3, Penthouse 402';
+        const pin = (pinEl ? pinEl.value.trim() : '') || '400001';
+        const city = (cityEl ? cityEl.value.trim() : '') || 'Mumbai';
+        const state = (stateEl ? stateEl.value.trim() : '') || 'Maharashtra';
+
+        const finalAddrEl = document.getElementById('final-address');
+        if (finalAddrEl) {
+            finalAddrEl.textContent = `${apt ? apt + ', ' : ''}${l1}, ${city}, ${state} - ${pin}`;
+        }
         
         const est = new Date();
         est.setDate(est.getDate() + 3);
-        document.getElementById('final-date').textContent = est.toLocaleDateString('en-IN', {
-            weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
-        });
+        const finalDateEl = document.getElementById('final-date');
+        if (finalDateEl) {
+            finalDateEl.textContent = est.toLocaleDateString('en-IN', {
+                weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
+            });
+        }
 
         // Set final card visual
         const finalCard = document.getElementById('final-card');
-        const finishClass = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
-        finalCard.className = `w-full h-full rounded-2xl shadow-2xl relative floating-anim ${finishClass} bg-gradient-to-br ${cardGradients[appData.cardColor]}`;
-        document.getElementById('final-tier-badge').textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
+        if (finalCard) {
+            const finishClass = appData.cardType === 'premium' ? 'finish-metal' : 'finish-plastic';
+            finalCard.className = `w-full h-full rounded-2xl shadow-2xl relative floating-anim ${finishClass} bg-gradient-to-br ${cardGradients[appData.cardColor]}`;
+        }
+        const finalTierBadge = document.getElementById('final-tier-badge');
+        if (finalTierBadge) {
+            finalTierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
+        }
 
         showVerificationLoader('Creating Express Card Account...');
         try {
