@@ -268,8 +268,8 @@ body {
     max-width: 280px;
 }
 
-/* Show landscape lock ONLY on small mobile screens in landscape */
-@media screen and (max-height: 500px) and (orientation: landscape) and (max-width: 940px) {
+/* Show landscape lock ONLY on actual mobile touch devices in landscape */
+@media screen and (max-height: 500px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
     #landscape-lock {
         display: flex !important;
     }
