@@ -90,23 +90,26 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Mini Card -->
                     <div class="lg:col-span-1">
-                        <div class="express-card {% if card.card_type == 'Premium' %}metal-card{% else %}plastic-card{% endif %} aspect-[1.586/1] rounded-2xl p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group
-                            {% if card.color == 'gold' %} bg-gradient-to-br from-[#FFD700] via-[#FDB931] to-[#996515] text-black
-                            {% elif card.color == 'rosegold' %} bg-gradient-to-br from-[#B76E79] via-[#E0BFB8] to-[#C07C88] text-white
-                            {% elif card.color == 'black' %} bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white
-                            {% elif card.color == 'ultra' %} bg-gradient-to-br from-gray-300 via-gray-100 to-gray-400 text-black
-                            {% elif card.color == 'ultrablue' %} bg-gradient-to-br from-blue-400 via-blue-300 to-blue-500 text-white
-                            {% endif %}">
-                            
-                            <div class="flex justify-between items-start">
-                                <div class="font-serif italic font-bold text-xl tracking-wider">EXPRESS</div>
-                            </div>
-                            
-                            <div class="mt-auto">
-                                <div class="font-mono tracking-widest text-lg mb-2 opacity-90">•••• •••• •••• {{ card.last4 | default('1234') }}</div>
-                                <div class="flex justify-between items-end">
-                                    <div class="font-medium tracking-widest uppercase">{{ user.name or 'Express Member' }}</div>
-                                    <div class="text-xs uppercase font-bold tracking-widest opacity-80">Contactless</div>
+                        <div class="relative w-full aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 {% if card.card_type|lower == 'premium' %}finish-metal{% else %}finish-plastic{% endif %} card-{{ card.color or 'gold' }}">
+                            <div class="relative z-[2] flex h-full flex-col justify-between p-6">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm sm:text-base font-display italic font-bold tracking-widest text-white/90">EXPRESS</span>
+                                    <span class="text-[9px] uppercase font-mono tracking-widest px-2 py-0.5 rounded bg-white/20 text-white font-semibold">
+                                        {% if card.card_type|lower == 'premium' %}METAL{% else %}PLASTIC{% endif %}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="w-9 h-7 bg-yellow-100/60 rounded-md border border-white/30 mb-3 shadow-inner"></div>
+                                    <p class="text-sm sm:text-base uppercase tracking-[0.25em] text-white/90 font-mono mb-1.5">
+                                        •••• •••• •••• {{ card.last4 | default('7163') }}
+                                    </p>
+                                    <div class="flex items-end justify-between">
+                                        <div>
+                                            <p class="text-xs tracking-[0.18em] text-white/90 font-mono font-medium">{{ user.name|upper if user and user.name else 'EXPRESS MEMBER' }}</p>
+                                            <p class="text-[8px] uppercase tracking-[0.24em] text-white/60 mt-0.5 font-mono">{{ card.card_type|capitalize }} {{ card.color|capitalize }}</p>
+                                        </div>
+                                        <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/50">Contactless</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

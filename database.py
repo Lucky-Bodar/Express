@@ -141,8 +141,41 @@ def get_user_address(user_id):
 
 def get_user_transactions(user_id):
     db = get_db()
-    return db.execute('SELECT * FROM transactions WHERE user_id = ?', (user_id,)).fetchall()
+    txns = db.execute('SELECT * FROM transactions WHERE user_id = ? ORDER BY id DESC', (user_id,)).fetchall()
+    if not txns:
+        # Seed realistic transaction history for this user
+        sample_txns = [
+            (user_id, 840.0, 'Starbucks Reserve Mumbai', 'Dining', 'Today, 2:15 PM', 0, None, None, 0),
+            (user_id, 4650.0, 'Taj Mahal Palace Fine Dining', 'Dining', 'Yesterday, 8:40 PM', 0, None, None, 0),
+            (user_id, 24999.0, 'Apple Store BKC', 'Electronics', 'Aug 24, 2026', 1, 6, 0.99, 2),
+            (user_id, 12450.0, 'Vistara Airlines Flight', 'Travel', 'Aug 18, 2026', 0, None, None, 0),
+            (user_id, 3200.0, 'Marriott Executive Lounge', 'Hospitality', 'Aug 12, 2026', 0, None, None, 0),
+            (user_id, 2890.0, 'Amazon India Retail', 'Shopping', 'Aug 08, 2026', 0, None, None, 0),
+            (user_id, 4200.0, 'Shell Fuel Station BKC', 'Fuel', 'Aug 02, 2026', 0, None, None, 0),
+            (user_id, 1850.0, 'Zomato Gold Delivery', 'Dining', 'Jul 28, 2026', 0, None, None, 0),
+            (user_id, 18500.0, 'The Oberoi Mumbai Weekend Stay', 'Travel', 'Jul 22, 2026', 1, 12, 0.99, 4)
+        ]
+        db.executemany('''
+            INSERT INTO transactions (user_id, amount, merchant, category, date, is_emi, emi_months, emi_rate, emi_paid)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', sample_txns)
+        db.commit()
+        txns = db.execute('SELECT * FROM transactions WHERE user_id = ? ORDER BY id DESC', (user_id,)).fetchall()
+    return txns
 
 def get_user_payments(user_id):
     db = get_db()
-    return db.execute('SELECT * FROM payments WHERE user_id = ?', (user_id,)).fetchall()
+    payments = db.execute('SELECT * FROM payments WHERE user_id = ? ORDER BY id DESC', (user_id,)).fetchall()
+    if not payments:
+        sample_payments = [
+            (user_id, 4410.0, 'Sep 01, 2026', None, 1),
+            (user_id, 1695.0, 'Sep 01, 2026', None, 1),
+            (user_id, 1499.0, 'Aug 28, 2026', 'Aug 28, 2026', 1)
+        ]
+        db.executemany('''
+            INSERT INTO payments (user_id, amount, due_date, paid_date, on_time)
+            VALUES (?, ?, ?, ?, ?)
+        ''', sample_payments)
+        db.commit()
+        payments = db.execute('SELECT * FROM payments WHERE user_id = ? ORDER BY id DESC', (user_id,)).fetchall()
+    return payments

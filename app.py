@@ -128,9 +128,41 @@ def dashboard():
     card_data['utilisation'] = round((card_data['spent'] / card_data['credit_limit']) * 100) if card_data['credit_limit'] else 0
     card_data['available_percent'] = 100 - card_data['utilisation']
     card_data['min_due'] = round(card_data['spent'] * 0.05)
+    
+    raw_txns = get_user_transactions(user['id'])
+    txns = []
+    for t in raw_txns:
+        td = dict(t)
+        td['amount'] = "{:,.2f}".format(td['amount']) if isinstance(td['amount'], (int, float)) else str(td['amount'])
+        td['emi_total'] = td.get('emi_months') or 6
+        txns.append(td)
+        
+    payments = [
+        {
+            'is_emi': True,
+            'merchant': 'Apple Store BKC',
+            'original_amount': '24,999.00',
+            'emi_amount': '4,410.00',
+            'months_remaining': 4,
+            'emi_paid': 2,
+            'emi_total': 6
+        },
+        {
+            'is_emi': True,
+            'merchant': 'The Oberoi Mumbai Weekend Stay',
+            'original_amount': '18,500.00',
+            'emi_amount': '1,695.00',
+            'months_remaining': 8,
+            'emi_paid': 4,
+            'emi_total': 12
+        }
+    ]
+    emi_total_monthly = 6105.0
+    
     return render_template(
         'dashboard.html', user=user, card=card_data,
-        transactions=get_user_transactions(user['id']), payments=get_user_payments(user['id']),
+        transactions=txns, payments=payments,
+        emi_total_monthly="{:,.2f}".format(emi_total_monthly),
         address=get_user_address(user['id'])
     )
 
@@ -342,20 +374,29 @@ def save_address():
     pincode = data.get('pincode', '400001')
     city = data.get('city', 'Mumbai')
     state = data.get('state', 'Maharashtra')
+    card_type = (data.get('card_type') or 'premium').lower()
+    color = (data.get('color') or 'gold').lower()
     
     db = get_db()
     card = get_user_card(g.user['id'])
     order_date = datetime.date.today().isoformat()
     delivery_date = (datetime.date.today() + datetime.timedelta(days=7)).strftime('%A, %b %d, %Y')
+    credit_limit = 250000 if card_type == 'premium' else 100000
     
     if not card:
         card_number = f"xxxx xxxx xxxx {random.randint(1000,9999)}"
         db.execute('''
             INSERT INTO cards (user_id, card_type, color, status, credit_limit, available_limit, order_date, delivery_date, card_number, on_time_payments)
-            VALUES (?, 'premium', 'gold', 'shipped', 250000, 250000, ?, ?, ?, 0)
-        ''', (g.user['id'], order_date, delivery_date, card_number))
+            VALUES (?, ?, ?, 'shipped', ?, ?, ?, ?, ?, 0)
+        ''', (g.user['id'], card_type, color, credit_limit, credit_limit, order_date, delivery_date, card_number))
     else:
-        db.execute("UPDATE cards SET status = 'shipped', delivery_date = ? WHERE user_id = ?", (delivery_date, g.user['id']))
+        db.execute('''
+            UPDATE cards 
+            SET status = 'shipped', delivery_date = ?,
+                card_type = COALESCE(NULLIF(?, ''), card_type),
+                color = COALESCE(NULLIF(?, ''), color)
+            WHERE user_id = ?
+        ''', (delivery_date, card_type, color, g.user['id']))
         
     db.execute('''
         INSERT INTO addresses (user_id, line1, line2, apartment, pincode, city, state)

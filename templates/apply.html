@@ -1093,10 +1093,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const finalTierBadge = document.getElementById('final-tier-badge');
             if (finalTierBadge) finalTierBadge.textContent = appData.cardType === 'premium' ? 'METAL' : 'PLASTIC';
 
-            addrBtn.disabled = true;
-            addrBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Issuing Express Card Account...</span>';
-
-            fireAPI('/api/save-address', { line1: l1, apartment: apt, pincode: pin, city: city, state: state });
+            fireAPI('/api/save-address', { 
+                line1: l1, 
+                apartment: apt, 
+                pincode: pin, 
+                city: city, 
+                state: state,
+                card_type: appData.cardType,
+                color: appData.cardColor
+            });
 
             setTimeout(() => {
                 addrBtn.className = 'w-full py-4 rounded-2xl bg-emerald-600 text-white font-semibold text-base sm:text-lg transition-all shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2';

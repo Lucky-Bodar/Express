@@ -207,16 +207,16 @@ body {
 }
 
 /* Card material, deliberately distinct so the Premium card reads as metal. */
-.express-card::after {
+.express-card::after, .finish-metal::after, .finish-plastic::after {
     content: '';
     position: absolute;
     inset: 0;
     pointer-events: none;
     border-radius: inherit;
 }
-.metal-card { box-shadow: 0 24px 44px -22px rgba(0,0,0,.72), inset 0 1px rgba(255,255,255,.7); }
-.metal-card::after { background: linear-gradient(115deg, rgba(255,255,255,.42), transparent 18%, transparent 68%, rgba(255,255,255,.2)); mix-blend-mode: soft-light; }
-.plastic-card { box-shadow: 0 18px 30px -20px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.45); }
+.metal-card, .finish-metal { box-shadow: 0 24px 44px -22px rgba(0,0,0,.72), inset 0 1px rgba(255,255,255,.7); position: relative; }
+.metal-card::after, .finish-metal::after { background: linear-gradient(115deg, rgba(255,255,255,.42), transparent 18%, transparent 68%, rgba(255,255,255,.2)); mix-blend-mode: soft-light; }
+.plastic-card, .finish-plastic { box-shadow: 0 18px 30px -20px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.45); position: relative; }
 
 /* ---------- Mobile-First Responsive (≤ 640px) ---------- */
 @media (max-width: 640px) {
