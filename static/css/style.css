@@ -281,8 +281,9 @@ body {
         max-width: 90vw !important;
     }
 
-    /* Grid layouts → stack on mobile */
-    .grid-cols-2 { grid-template-columns: 1fr !important; }
+    /* Grid layouts → stack large cards on mobile, keep compact stats */
+    .feature-grid, .pricing-grid { grid-template-columns: 1fr !important; }
+    .lg\\:grid-cols-12 { grid-template-columns: 1fr !important; }
     .lg\\:grid-cols-6 { grid-template-columns: 1fr !important; }
     .lg\\:grid-cols-3 { grid-template-columns: 1fr !important; }
     .lg\\:grid-cols-4 { grid-template-columns: 1fr !important; }

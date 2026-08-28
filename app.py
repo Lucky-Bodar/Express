@@ -27,34 +27,38 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
+def get_current_user():
+    session_token = request.cookies.get('express_session')
+    if not session_token:
+        return None
+    db = get_db()
+    return db.execute('SELECT * FROM users WHERE session_token = ?', (session_token,)).fetchone()
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        session_token = request.cookies.get('express_session')
+        user = get_current_user()
+        is_new_session = False
         db = get_db()
-        user = None
-        if session_token:
-            user = db.execute('SELECT * FROM users WHERE session_token = ?', (session_token,)).fetchone()
-        
         if not user:
-            # Check if any user exists in DB or auto-provision a demo user session
-            user = db.execute('SELECT * FROM users ORDER BY id DESC LIMIT 1').fetchone()
-            if not user:
-                token = str(uuid.uuid4())
-                db.execute('INSERT INTO users (phone, session_token, name, age) VALUES (?, ?, ?, ?)',
-                           ('9876543210', token, 'Express Member', 25))
-                db.commit()
-                user = db.execute('SELECT * FROM users WHERE session_token = ?', (token,)).fetchone()
+            # Create a fresh isolated session for new applicant
+            token = str(uuid.uuid4())
+            cursor = db.cursor()
+            cursor.execute('INSERT INTO users (session_token, name, age) VALUES (?, ?, ?)',
+                           (token, 'Express Member', 25))
+            db.commit()
+            user = db.execute('SELECT * FROM users WHERE session_token = ?', (token,)).fetchone()
+            is_new_session = True
         
         g.user = user
         result = f(*args, **kwargs)
         if isinstance(result, str): # Rendered template response
             response = make_response(result)
-            if user and user['session_token'] and not session_token:
+            if (is_new_session or not request.cookies.get('express_session')) and user and user['session_token']:
                 response.set_cookie('express_session', user['session_token'], httponly=True, samesite='Lax', max_age=86400*30)
             return response
         elif hasattr(result, 'set_cookie'):
-            if user and user['session_token'] and not session_token:
+            if (is_new_session or not request.cookies.get('express_session')) and user and user['session_token']:
                 result.set_cookie('express_session', user['session_token'], httponly=True, samesite='Lax', max_age=86400*30)
             return result
         return result
@@ -64,6 +68,12 @@ def login_required(f):
 
 @app.route('/')
 def welcome():
+    # If user already has an active session with card, redirect straight to home
+    user = get_current_user()
+    if user:
+        card = get_user_card(user['id'])
+        if card:
+            return redirect(url_for('home'))
     return render_template('welcome.html')
 
 @app.route('/login')
@@ -81,20 +91,22 @@ def logout():
     return response
 
 @app.route('/home')
-@login_required
 def home():
-    user = dict(g.user)
-    card = get_user_card(user['id'])
-    card_data = dict(card) if card else None
-    if card_data:
-        card_data['last4'] = (card_data.get('card_number') or '7163')[-4:]
-        card_data['card_type'] = (card_data.get('card_type') or 'premium').lower()
-        card_data['color'] = (card_data.get('color') or 'gold').lower()
-        card_data['spent'] = max(0, (card_data.get('credit_limit') or 0) - (card_data.get('available_limit') or 0))
-        card_data['utilisation'] = round((card_data['spent'] / card_data['credit_limit']) * 100) if card_data['credit_limit'] else 0
-        card_data['available_percent'] = 100 - card_data['utilisation']
-        card_data['min_due'] = round(card_data['spent'] * 0.05)
-    return render_template('index.html', user=user, has_card=(card is not None), card=card_data)
+    user_row = get_current_user()
+    user = dict(user_row) if user_row else None
+    card_data = None
+    if user:
+        card = get_user_card(user['id'])
+        if card:
+            card_data = dict(card)
+            card_data['last4'] = (card_data.get('card_number') or '7163')[-4:]
+            card_data['card_type'] = (card_data.get('card_type') or 'premium').lower()
+            card_data['color'] = (card_data.get('color') or 'gold').lower()
+            card_data['spent'] = max(0, (card_data.get('credit_limit') or 0) - (card_data.get('available_limit') or 0))
+            card_data['utilisation'] = round((card_data['spent'] / card_data['credit_limit']) * 100) if card_data['credit_limit'] else 0
+            card_data['available_percent'] = 100 - card_data['utilisation']
+            card_data['min_due'] = round(card_data['spent'] * 0.05)
+    return render_template('index.html', user=user, has_card=(card_data is not None), card=card_data)
 
 @app.route('/apply')
 @login_required

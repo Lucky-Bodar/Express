@@ -639,8 +639,32 @@
       body.elegant-bg {
         background-attachment: scroll !important;
       }
-      /* Prevent hero section from overflowing */
-      .sticky { position: relative !important; height: auto !important; min-height: 100vh; }
+      /* On mobile phones, make hero pinned section height fit naturally without empty 180vh gaps */
+      .hero-pinned {
+        height: auto !important;
+        min-height: 100svh !important;
+      }
+      .hero-pinned > .sticky {
+        position: relative !important;
+        height: auto !important;
+        min-height: 100svh !important;
+        padding-top: 2rem !important;
+        padding-bottom: 2.5rem !important;
+      }
+      /* Fix mobile padding so sections don't have massive empty dead spaces */
+      .py-28, .py-36 {
+        padding-top: 3.5rem !important;
+        padding-bottom: 3.5rem !important;
+      }
+      .min-h-\[68vh\] {
+        min-height: auto !important;
+        padding-top: 3rem !important;
+        padding-bottom: 3rem !important;
+      }
+      /* Ensure cards fit mobile width */
+      #hero-card, #showcase-card, .express-card {
+        max-width: 88vw !important;
+      }
       /* Ensure all absolute decorative blobs don't cause overflow */
       [class*="size-[52rem]"],
       [class*="size-[34rem]"],
@@ -719,7 +743,179 @@
 
   <main class="flex-1">
 
-    <!-- ═══ HERO — Text ABOVE Card ═══ -->
+    <!-- ═══ HERO ═══ -->
+    {% if card %}
+    <!-- ═══ USER APPLIED STATE: Live Card Dashboard at Top of Main Page ═══ -->
+    <div id="top" class="hero-wrap relative bg-[#fbfbfa] pt-8 pb-14 sm:pt-12 sm:pb-20 border-b border-black/[0.06]">
+      <div class="mx-auto max-w-5xl px-4 sm:px-6">
+        <div class="text-center mb-8 sm:mb-12 text-reveal">
+          <span class="font-mono text-[10px] uppercase tracking-[0.32em] text-[#e35d12] font-semibold">Live Card Account</span>
+          <h1 class="text-titanium mt-2 text-[30px] sm:text-[46px] font-normal leading-tight tracking-[-0.02em]">Your Express Card &amp; Limits</h1>
+          <p class="text-xs sm:text-sm text-gray-500 font-mono mt-1">Real-time balances, card security, and billing overview</p>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+          
+          <!-- Left Col: Card Visual & Controls (5 cols) -->
+          <div class="lg:col-span-5 text-reveal flex flex-col items-center">
+            <div class="relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 {% if card.card_type == 'premium' %}finish-metal{% else %}finish-plastic{% endif %} card-{{ card.color or 'gold' }}">
+              <div class="relative z-[2] flex h-full flex-col justify-between p-6 sm:p-7">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm sm:text-base font-display italic font-bold tracking-widest text-white/90">EXPRESS</span>
+                  <span class="text-[9px] uppercase font-mono tracking-widest px-2 py-0.5 rounded bg-white/20 text-white font-semibold">
+                    {% if card.card_type == 'premium' %}METAL{% else %}PLASTIC{% endif %}
+                  </span>
+                </div>
+                <div>
+                  <div class="w-9 h-7 bg-yellow-100/60 rounded-md border border-white/30 mb-3 shadow-inner"></div>
+                  <p class="text-sm sm:text-base uppercase tracking-[0.25em] text-white/90 font-mono mb-1.5">
+                    •••• •••• •••• {{ card.last4 | default('7163') }}
+                  </p>
+                  <div class="flex items-end justify-between">
+                    <div>
+                      <p class="text-xs tracking-[0.18em] text-white/90 font-mono font-medium">{{ user.name|upper if user and user.name else 'EXPRESS MEMBER' }}</p>
+                      <p class="text-[8px] uppercase tracking-[0.24em] text-white/50 mt-0.5 font-mono">{{ card.card_type|capitalize }} {{ card.color|capitalize }}</p>
+                    </div>
+                    <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/40">Contactless</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Controls (CVV Eye Toggle & Manage) -->
+            <div class="w-full max-w-[360px] mt-4 flex items-center justify-between bg-white border border-black/[0.06] rounded-2xl p-4 shadow-sm">
+              <div class="flex items-center gap-2.5">
+                <span class="text-xs font-mono uppercase tracking-wider text-gray-500 font-semibold">CVV:</span>
+                <span id="card-cvv-text" class="font-mono text-base tracking-widest text-gray-900 font-bold">•••</span>
+                <button type="button" id="cvv-eye-toggle" class="text-gray-400 hover:text-[#e35d12] transition-colors p-1 rounded-md cursor-pointer" title="Toggle CVV View">
+                  <svg id="eye-icon-closed" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+                  <svg id="eye-icon-open" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+              <a href="/dashboard" class="text-xs font-semibold text-[#e35d12] hover:underline flex items-center gap-1 font-mono">
+                Manage Card →
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Col: Limits, Utilisation, Dues & EMI (7 cols) -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- Credit Limit & Percentage Bar -->
+            <div class="text-reveal bg-white rounded-2xl border border-black/[0.06] p-5 sm:p-6 shadow-sm">
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <span class="text-[10px] uppercase tracking-[0.2em] text-[#8a8a92] font-mono font-semibold block mb-0.5">Total Approved Limit</span>
+                  <span class="text-2xl sm:text-3xl font-bold text-[#0d0d0f]">₹{{ "{:,}".format(card.credit_limit) }}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[11px] font-mono font-bold px-3 py-1 rounded-full {% if card.spent == 0 or not card.spent %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                    {{ card.available_percent | default(100) }}% Available
+                  </span>
+                  <span class="text-[10px] text-gray-400 font-mono block mt-1">({{ card.utilisation | default(0) }}% Utilised)</span>
+                </div>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden mb-3.5 p-0.5">
+                <div class="h-full bg-gradient-to-r from-emerald-500 to-[#e35d12] rounded-full transition-all duration-1000" style="width: {{ card.utilisation | default(0) }}%"></div>
+              </div>
+
+              <div class="flex justify-between text-xs sm:text-sm font-mono">
+                <span class="text-gray-500">Spent: <strong class="text-[#0d0d0f]">₹{{ "{:,}".format(card.spent | default(0)) }}</strong></span>
+                <span class="text-gray-500">Available: <strong class="text-emerald-600">₹{{ "{:,}".format(card.available_limit | default(card.credit_limit)) }}</strong></span>
+              </div>
+            </div>
+
+            <!-- Zero Spent State or Active Dues State -->
+            {% if card.spent == 0 or not card.spent %}
+            <div class="text-reveal bg-emerald-50/80 border border-emerald-200/80 rounded-2xl p-4 sm:p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 sm:gap-3.5">
+                  <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm">
+                    ✓
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-emerald-950">Credit is not used yet</h4>
+                    <p class="text-[11px] sm:text-xs text-emerald-800 font-mono">No dues right now • ₹0.00 Outstanding Balance</p>
+                  </div>
+                </div>
+                <span class="text-[10px] uppercase font-mono px-3 py-1 rounded-full bg-emerald-200/60 text-emerald-900 font-bold hidden sm:inline-block">
+                  Next Bill: 1st
+                </span>
+              </div>
+            </div>
+            {% else %}
+            <div class="text-reveal bg-amber-50/80 border border-amber-200/80 rounded-2xl p-4 sm:p-5 shadow-sm">
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="text-[10px] uppercase tracking-[0.2em] text-amber-800 font-mono block mb-0.5">Next Minimum Due (5%)</span>
+                  <span class="text-xl sm:text-2xl font-bold text-amber-950">₹{{ "{:,}".format(card.min_due) }}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] uppercase tracking-[0.2em] text-amber-800 font-mono block mb-0.5">Payment Due Date</span>
+                  <span class="text-sm font-bold text-amber-950 font-mono">15th of month</span>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Interactive EMI Plans -->
+            <div class="text-reveal bg-white rounded-2xl border border-black/[0.06] p-5 sm:p-6 shadow-sm">
+              <div class="flex justify-between items-center mb-3.5">
+                <div>
+                  <span class="text-[10px] uppercase tracking-[0.2em] text-[#8a8a92] font-mono font-semibold block">Flexible 0.99% EMI Plans</span>
+                  <p class="text-xs font-semibold text-[#0d0d0f] mt-0.5">Instant Spends to EMI Conversion</p>
+                </div>
+                <span class="text-[11px] text-[#e35d12] bg-[#e35d12]/10 border border-[#e35d12]/20 font-mono font-semibold px-2.5 py-1 rounded-full">0.99% p.m.</span>
+              </div>
+              
+              <!-- EMI Tenure Buttons -->
+              <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-4" id="emi-tenure-group">
+                <button type="button" data-tenure="3" class="emi-tenure-btn py-2.5 px-2 rounded-xl border-2 border-[#e35d12] bg-[#e35d12]/10 text-[#e35d12] text-xs sm:text-sm font-bold shadow-sm ring-1 ring-[#e35d12]/30 transition-all cursor-pointer">
+                  3 Months
+                </button>
+                <button type="button" data-tenure="6" class="emi-tenure-btn py-2.5 px-2 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 text-xs sm:text-sm font-medium transition-all cursor-pointer">
+                  6 Months
+                </button>
+                <button type="button" data-tenure="12" class="emi-tenure-btn py-2.5 px-2 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 text-xs sm:text-sm font-medium transition-all cursor-pointer">
+                  12 Months
+                </button>
+              </div>
+
+              <!-- Dynamic EMI Preview Card -->
+              <div class="bg-[#faf9f7] rounded-xl p-4 border border-black/[0.05] transition-all">
+                <div class="flex justify-between items-center pb-2.5 border-b border-black/[0.06]">
+                  <span class="text-xs text-gray-500 font-mono">Monthly Installment:</span>
+                  <span id="emi-monthly-val" class="text-base sm:text-lg font-bold text-[#e35d12] font-mono">₹5,149/mo</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2.5 text-[11px] font-mono text-gray-500">
+                  <div>Interest Rate: <strong id="emi-rate-val" class="text-gray-900">0.99% p.m. (11.88% APR)</strong></div>
+                  <div class="text-right">Processing Fee: <strong class="text-emerald-600 font-bold">₹0 Free</strong></div>
+                  <div>Total Interest: <strong id="emi-total-interest" class="text-gray-900">₹446</strong></div>
+                  <div class="text-right"><span id="emi-savings-val" class="text-emerald-700 font-semibold">Save ₹1,129 vs 3.5% card rate</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="text-reveal grid grid-cols-2 gap-3 sm:gap-4">
+              <div class="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-sm text-center">
+                <span class="text-xl sm:text-2xl font-bold text-[#0d0d0f] font-mono">{{ card.on_time_payments | default(0) }}</span>
+                <span class="text-[10px] uppercase tracking-[0.16em] text-[#8a8a92] font-mono block mt-1">On-time Payments</span>
+              </div>
+              <div class="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-sm text-center">
+                <span class="text-xl sm:text-2xl font-bold text-[#0d0d0f] font-mono">{{ card.limit_increases | default(0) }}</span>
+                <span class="text-[10px] uppercase tracking-[0.16em] text-[#8a8a92] font-mono block mt-1">Limit Increases</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- ═══ UNAPPLIED / GUEST STATE: Interactive Hero with Card Zoom & Apply Now ═══ -->
     <div id="top" class="hero-wrap relative">
         <!-- Mouse Follow Glow Layer -->
         <div id="hero-glow">
@@ -730,7 +926,7 @@
           <div class="glow-orb glow-cursor" id="glow-cursor"></div>
         </div>
 
-      <section class="relative h-[180vh]">
+      <section class="hero-pinned relative h-[180vh]">
         <div class="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden">
           <!-- Background -->
           <div aria-hidden="true" class="absolute inset-0">
@@ -753,7 +949,6 @@
               <div class="relative z-[2] flex h-full flex-col justify-between p-7 sm:p-9">
                 <div class="flex items-start justify-between">
                   <span class="text-[13px] font-semibold italic tracking-tight text-white/80">EXPRESS</span>
-                  
                 </div>
                 <div class="flex items-center">
                   <div class="w-11 h-8 rounded-[5px] bg-gradient-to-br from-yellow-100/60 to-yellow-500/40 border border-white/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3)]"></div>
@@ -810,6 +1005,7 @@
         </div>
       </section>
     </div>
+    {% endif %}
 
     <!-- ═══ THE CARD ═══ -->
     <section id="the-card" class="relative bg-[#fbfbfa] dot-mesh py-28 sm:py-36">
@@ -1207,159 +1403,6 @@
       </div>
     </section>
 
-    <!-- ═══ MY CARD DASHBOARD (only if user has a card) ═══ -->
-    {% if card %}
-    <section id="my-card" class="relative bg-[#fbfbfa] py-16 sm:py-24 px-4 sm:px-6 border-t border-black/[0.06]">
-      <div class="mx-auto max-w-5xl">
-        <div class="text-center mb-10 sm:mb-14 text-reveal">
-          <span class="font-mono text-[10px] uppercase tracking-[0.32em] text-[#e35d12] font-semibold">Live Card Account</span>
-          <h2 class="text-titanium mt-2 text-[28px] sm:text-[42px] font-normal leading-tight tracking-[-0.02em]">Your Express Card & Limits</h2>
-          <p class="text-xs sm:text-sm text-gray-500 font-mono mt-1">Real-time balances, card security, and billing overview</p>
-        </div>
-
-        <div class="grid lg:grid-cols-12 gap-8 items-start">
-          
-          <!-- Left Col: Card Visual & Controls (5 cols) -->
-          <div class="lg:col-span-5 text-reveal flex flex-col items-center">
-            <div class="relative w-full max-w-[360px] aspect-[1.586/1] rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 {% if card.card_type == 'premium' %}finish-metal{% else %}finish-plastic{% endif %} card-{{ card.color or 'gold' }}">
-              <div class="relative z-[2] flex h-full flex-col justify-between p-6 sm:p-7">
-                <div class="flex justify-between items-center">
-                  <span class="text-sm sm:text-base font-display italic font-bold tracking-widest text-white/90">EXPRESS</span>
-                  <span class="text-[9px] uppercase font-mono tracking-widest px-2 py-0.5 rounded bg-white/20 text-white font-semibold">
-                    {% if card.card_type == 'premium' %}METAL{% else %}PLASTIC{% endif %}
-                  </span>
-                </div>
-                <div>
-                  <div class="w-9 h-7 bg-yellow-100/60 rounded-md border border-white/30 mb-3 shadow-inner"></div>
-                  <p class="text-sm sm:text-base uppercase tracking-[0.25em] text-white/90 font-mono mb-1.5">
-                    •••• •••• •••• {{ card.last4 | default('7163') }}
-                  </p>
-                  <div class="flex items-end justify-between">
-                    <div>
-                      <p class="text-xs tracking-[0.18em] text-white/90 font-mono font-medium">{{ user.name|upper if user.name else 'EXPRESS MEMBER' }}</p>
-                      <p class="text-[8px] uppercase tracking-[0.24em] text-white/50 mt-0.5 font-mono">{{ card.card_type|capitalize }} {{ card.color|capitalize }}</p>
-                    </div>
-                    <span class="font-mono text-[8px] uppercase tracking-[0.2em] text-white/40">Contactless</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card Controls (CVV Eye Toggle & Manage) -->
-            <div class="w-full max-w-[360px] mt-4 flex items-center justify-between bg-white border border-black/[0.06] rounded-2xl p-4 shadow-sm">
-              <div class="flex items-center gap-2.5">
-                <span class="text-xs font-mono uppercase tracking-wider text-gray-500 font-semibold">CVV:</span>
-                <span id="card-cvv-text" class="font-mono text-base tracking-widest text-gray-900 font-bold">•••</span>
-                <button type="button" id="cvv-eye-toggle" class="text-gray-400 hover:text-[#e35d12] transition-colors p-1 rounded-md" title="Toggle CVV View">
-                  <svg id="eye-icon-closed" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
-                  <svg id="eye-icon-open" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                </button>
-              </div>
-              <a href="/dashboard" class="text-xs font-semibold text-[#e35d12] hover:underline flex items-center gap-1 font-mono">
-                Manage Card →
-              </a>
-            </div>
-          </div>
-
-          <!-- Right Col: Limits, Utilisation, Dues & EMI (7 cols) -->
-          <div class="lg:col-span-7 flex flex-col gap-4">
-            
-            <!-- Credit Limit & Percentage Bar -->
-            <div class="text-reveal bg-white rounded-2xl border border-black/[0.06] p-6 shadow-sm">
-              <div class="flex justify-between items-start mb-3">
-                <div>
-                  <span class="text-[10px] uppercase tracking-[0.2em] text-[#8a8a92] font-mono font-semibold block mb-0.5">Total Approved Limit</span>
-                  <span class="text-2xl sm:text-3xl font-bold text-[#0d0d0f]">₹{{ "{:,}".format(card.credit_limit) }}</span>
-                </div>
-                <div class="text-right">
-                  <span class="text-[11px] font-mono font-bold px-3 py-1 rounded-full {% if card.spent == 0 or not card.spent %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
-                    {{ card.available_percent | default(100) }}% Available
-                  </span>
-                  <span class="text-[10px] text-gray-400 font-mono block mt-1">({{ card.utilisation | default(0) }}% Utilised)</span>
-                </div>
-              </div>
-              
-              <!-- Progress Bar -->
-              <div class="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden mb-3.5 p-0.5">
-                <div class="h-full bg-gradient-to-r from-emerald-500 to-[#e35d12] rounded-full transition-all duration-1000" style="width: {{ card.utilisation | default(0) }}%"></div>
-              </div>
-
-              <div class="flex justify-between text-xs sm:text-sm font-mono">
-                <span class="text-gray-500">Spent: <strong class="text-[#0d0d0f]">₹{{ "{:,}".format(card.spent | default(0)) }}</strong></span>
-                <span class="text-gray-500">Available: <strong class="text-emerald-600">₹{{ "{:,}".format(card.available_limit | default(card.credit_limit)) }}</strong></span>
-              </div>
-            </div>
-
-            <!-- Zero Spent State or Active Dues State -->
-            {% if card.spent == 0 or not card.spent %}
-            <div class="text-reveal bg-emerald-50/80 border border-emerald-200/80 rounded-2xl p-5 shadow-sm">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3.5">
-                  <div class="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                    ✓
-                  </div>
-                  <div>
-                    <h4 class="text-sm font-bold text-emerald-950">Credit is not used yet</h4>
-                    <p class="text-xs text-emerald-800 font-mono">No dues right now • ₹0.00 Outstanding Balance</p>
-                  </div>
-                </div>
-                <span class="text-[10px] uppercase font-mono px-3 py-1 rounded-full bg-emerald-200/60 text-emerald-900 font-bold hidden sm:inline-block">
-                  Next Bill: 1st
-                </span>
-              </div>
-            </div>
-            {% else %}
-            <div class="text-reveal bg-amber-50/80 border border-amber-200/80 rounded-2xl p-5 shadow-sm">
-              <div class="flex justify-between items-center">
-                <div>
-                  <span class="text-[10px] uppercase tracking-[0.2em] text-amber-800 font-mono block mb-0.5">Next Minimum Due (5%)</span>
-                  <span class="text-xl sm:text-2xl font-bold text-amber-950">₹{{ "{:,}".format(card.min_due) }}</span>
-                </div>
-                <div class="text-right">
-                  <span class="text-[10px] uppercase tracking-[0.2em] text-amber-800 font-mono block mb-0.5">Payment Due Date</span>
-                  <span class="text-sm font-bold text-amber-950 font-mono">15th of month</span>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-
-            <!-- EMI Plans -->
-            <div class="text-reveal bg-white rounded-2xl border border-black/[0.06] p-5 sm:p-6 shadow-sm">
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-[10px] uppercase tracking-[0.2em] text-[#8a8a92] font-mono font-semibold">Flexible 0.99% EMI Plans</span>
-                <span class="text-xs text-[#e35d12] font-mono font-semibold">No Cost EMIs</span>
-              </div>
-              <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
-                <button type="button" class="py-2.5 px-2 rounded-xl border-2 border-[#e35d12] bg-[#e35d12]/5 text-[#e35d12] text-xs sm:text-sm font-semibold transition-all">
-                  3 Months
-                </button>
-                <button type="button" class="py-2.5 px-2 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 text-xs sm:text-sm font-medium transition-all">
-                  6 Months
-                </button>
-                <button type="button" class="py-2.5 px-2 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 text-xs sm:text-sm font-medium transition-all">
-                  12 Months
-                </button>
-              </div>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="text-reveal grid grid-cols-2 gap-3 sm:gap-4">
-              <div class="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-sm text-center">
-                <span class="text-xl sm:text-2xl font-bold text-[#0d0d0f] font-mono">{{ card.on_time_payments | default(0) }}</span>
-                <span class="text-[10px] uppercase tracking-[0.16em] text-[#8a8a92] font-mono block mt-1">On-time Payments</span>
-              </div>
-              <div class="bg-white rounded-2xl border border-black/[0.06] p-4 sm:p-5 shadow-sm text-center">
-                <span class="text-xl sm:text-2xl font-bold text-[#0d0d0f] font-mono">{{ card.limit_increases | default(0) }}</span>
-                <span class="text-[10px] uppercase tracking-[0.16em] text-[#8a8a92] font-mono block mt-1">Limit Increases</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </section>
-    {% endif %}
-
   </main>
 
   <!-- ═══ FOOTER ═══ -->
@@ -1421,6 +1464,58 @@
           eyeClosed.classList.remove('hidden');
           eyeOpen.classList.add('hidden');
         }
+      });
+    }
+
+    // Interactive Flexible EMI Calculator
+    const emiBtns = document.querySelectorAll('.emi-tenure-btn');
+    const emiMonthlyVal = document.getElementById('emi-monthly-val');
+    const emiRateVal = document.getElementById('emi-rate-val');
+    const emiTotalInterest = document.getElementById('emi-total-interest');
+    const emiSavingsVal = document.getElementById('emi-savings-val');
+
+    if (emiBtns.length) {
+      const baseAmount = {% if card and card.spent and card.spent > 1000 %}{{ card.spent }}{% else %}15000{% endif %};
+      const emiSchedule = {
+        '3': {
+          months: 3,
+          rateText: '0.99% p.m. (11.88% APR)',
+          monthly: Math.round((baseAmount / 3) + (baseAmount * 0.0099)),
+          interest: Math.round(baseAmount * 0.0099 * 3),
+          savings: Math.round(baseAmount * (0.035 - 0.0099) * 3)
+        },
+        '6': {
+          months: 6,
+          rateText: '0.99% p.m. (11.88% APR)',
+          monthly: Math.round((baseAmount / 6) + (baseAmount * 0.0099)),
+          interest: Math.round(baseAmount * 0.0099 * 6),
+          savings: Math.round(baseAmount * (0.035 - 0.0099) * 6)
+        },
+        '12': {
+          months: 12,
+          rateText: '0.99% p.m. (11.88% APR)',
+          monthly: Math.round((baseAmount / 12) + (baseAmount * 0.0099)),
+          interest: Math.round(baseAmount * 0.0099 * 12),
+          savings: Math.round(baseAmount * (0.035 - 0.0099) * 12)
+        }
+      };
+
+      emiBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          emiBtns.forEach(b => {
+            b.className = 'emi-tenure-btn py-2.5 px-2 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 text-xs sm:text-sm font-medium transition-all cursor-pointer';
+          });
+          this.className = 'emi-tenure-btn py-2.5 px-2 rounded-xl border-2 border-[#e35d12] bg-[#e35d12]/10 text-[#e35d12] text-xs sm:text-sm font-bold shadow-sm ring-1 ring-[#e35d12]/30 transition-all cursor-pointer';
+          
+          const tenure = this.dataset.tenure || '3';
+          const plan = emiSchedule[tenure] || emiSchedule['3'];
+          
+          if (emiMonthlyVal) emiMonthlyVal.textContent = '₹' + Number(plan.monthly).toLocaleString('en-IN') + '/mo';
+          if (emiRateVal) emiRateVal.textContent = plan.rateText;
+          if (emiTotalInterest) emiTotalInterest.textContent = '₹' + Number(plan.interest).toLocaleString('en-IN');
+          if (emiSavingsVal) emiSavingsVal.textContent = 'Save ₹' + Number(plan.savings).toLocaleString('en-IN') + ' vs 3.5% card rate';
+        });
       });
     }
 
