@@ -2,7 +2,10 @@
 <html lang="en" class="h-full antialiased scroll-smooth">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="screen-orientation" content="portrait" />
   <title>EXPRESS — I Am Worth It</title>
   <meta name="color-scheme" content="light" />
   
@@ -10,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwindcss.config = {
@@ -624,10 +628,39 @@
     html.dark #chatbot-input { background-color: #1a1a20 !important; color: #ffffff !important; }
     html.dark #chatbot-input::placeholder { color: #71717a !important; }
 
+    /* ── Mobile Fixes ── */
+    @supports (-webkit-touch-callout: none) {
+      /* iOS Safari: background-attachment: fixed causes blank bg */
+      body.elegant-bg {
+        background-attachment: scroll !important;
+      }
+    }
+    @media (max-width: 640px) {
+      body.elegant-bg {
+        background-attachment: scroll !important;
+      }
+      /* Prevent hero section from overflowing */
+      .sticky { position: relative !important; height: auto !important; min-height: 100vh; }
+      /* Ensure all absolute decorative blobs don't cause overflow */
+      [class*="size-[52rem]"],
+      [class*="size-[34rem]"],
+      [class*="size-[26rem]"],
+      [class*="size-[720px]"] {
+        max-width: 100vw !important;
+        overflow: hidden;
+      }
+    }
   </style>
 </head>
 
 <body class="flex min-h-full flex-col elegant-bg font-sans">
+
+  <!-- Landscape Lock Overlay — shows "rotate to portrait" on mobile landscape -->
+  <div id="landscape-lock" aria-hidden="true">
+    <div class="rotate-icon"></div>
+    <h2>Please rotate your device</h2>
+    <p>This experience is designed for portrait mode. Please rotate your phone to continue.</p>
+  </div>
 
   <!-- ═══ HEADER ═══ -->
   <header id="site-header" class="sticky top-0 z-50 w-full" style="opacity:0; transform:translateY(-80px)">

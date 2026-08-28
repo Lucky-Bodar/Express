@@ -2,7 +2,10 @@
 <html lang="en" class="h-full antialiased scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="screen-orientation" content="portrait">
   <meta name="color-scheme" content="light dark">
   <title>{% block title %}EXPRESS{% endblock %} — I Am Worth It</title>
   <meta name="description" content="The premium credit card with unbeatable interest rates.">
@@ -55,6 +58,13 @@
   {% block head %}{% endblock %}
 </head>
 <body class="flex min-h-full flex-col font-sans antialiased transition-colors duration-300">
+  <!-- Landscape Lock Overlay — shows "rotate to portrait" on mobile landscape -->
+  <div id="landscape-lock" aria-hidden="true">
+    <div class="rotate-icon"></div>
+    <h2>Please rotate your device</h2>
+    <p>This experience is designed for portrait mode. Please rotate your phone to continue.</p>
+  </div>
+
   {% block body %}{% endblock %}
   <script src="/static/js/app.js"></script>
   {% block scripts %}{% endblock %}
