@@ -218,66 +218,6 @@ body {
 .metal-card::after { background: linear-gradient(115deg, rgba(255,255,255,.42), transparent 18%, transparent 68%, rgba(255,255,255,.2)); mix-blend-mode: soft-light; }
 .plastic-card { box-shadow: 0 18px 30px -20px rgba(0,0,0,.6), inset 0 1px rgba(255,255,255,.45); }
 
-/* ---------- Landscape Lock Overlay ---------- */
-#landscape-lock {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    background: #0a0a0c;
-    color: #fff;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    text-align: center;
-    padding: 2rem;
-}
-#landscape-lock .rotate-icon {
-    width: 64px;
-    height: 64px;
-    border: 3px solid #e35d12;
-    border-radius: 12px;
-    position: relative;
-    animation: rotate-phone 2s ease-in-out infinite;
-}
-#landscape-lock .rotate-icon::after {
-    content: '';
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 3px;
-    background: #e35d12;
-    border-radius: 2px;
-}
-@keyframes rotate-phone {
-    0%, 100% { transform: rotate(90deg); }
-    30%, 70% { transform: rotate(0deg); }
-}
-#landscape-lock h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-}
-#landscape-lock p {
-    font-size: 0.875rem;
-    color: #a1a1aa;
-    margin: 0;
-    max-width: 280px;
-}
-
-/* Show landscape lock ONLY on actual mobile touch devices in landscape */
-@media screen and (max-height: 500px) and (orientation: landscape) and (hover: none) and (pointer: coarse) {
-    #landscape-lock {
-        display: flex !important;
-    }
-    main, header, footer, #chatbot-fab, #chatbot-window, .welcome-screen {
-        display: none !important;
-    }
-}
-
 /* ---------- Mobile-First Responsive (≤ 640px) ---------- */
 @media (max-width: 640px) {
     html {

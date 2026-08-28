@@ -58,13 +58,6 @@
   {% block head %}{% endblock %}
 </head>
 <body class="flex min-h-full flex-col font-sans antialiased transition-colors duration-300">
-  <!-- Landscape Lock Overlay — shows "rotate to portrait" on mobile landscape -->
-  <div id="landscape-lock" aria-hidden="true">
-    <div class="rotate-icon"></div>
-    <h2>Please rotate your device</h2>
-    <p>This experience is designed for portrait mode. Please rotate your phone to continue.</p>
-  </div>
-
   {% block body %}{% endblock %}
   <script src="/static/js/app.js"></script>
   {% block scripts %}{% endblock %}
