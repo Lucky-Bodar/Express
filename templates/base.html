@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full antialiased scroll-smooth">
+<html lang="en" class="h-full antialiased scroll-smooth overflow-x-hidden">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="screen-orientation" content="portrait">
@@ -57,7 +57,7 @@
   <link rel="stylesheet" href="/static/css/style.css">
   {% block head %}{% endblock %}
 </head>
-<body class="flex min-h-full flex-col font-sans antialiased transition-colors duration-300">
+<body class="flex min-h-full flex-col font-sans antialiased transition-colors duration-300 overflow-x-hidden">
   {% block body %}{% endblock %}
   <script src="/static/js/app.js"></script>
   {% block scripts %}{% endblock %}
