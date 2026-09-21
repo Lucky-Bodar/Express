@@ -1,18 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="brand" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e35d12"/>
-      <stop offset="100%" stop-color="#c2186f"/>
+    <!-- Obsidian Metal Background -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F2026"/>
+      <stop offset="100%" stop-color="#0A0A0C"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.35"/>
+    
+    <!-- Premium Metallic Gold Gradient -->
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2DF91"/>
+      <stop offset="25%" stop-color="#C59B58"/>
+      <stop offset="50%" stop-color="#E8C37B"/>
+      <stop offset="75%" stop-color="#9A7232"/>
+      <stop offset="100%" stop-color="#FDF1CA"/>
+    </linearGradient>
+
+    <!-- Subtle elegant shadow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.8"/>
     </filter>
   </defs>
+
+  <!-- Base App Icon Shape -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
   
-  <rect width="512" height="512" rx="128" fill="url(#brand)" />
-  
-  <g transform="translate(130, 126)" fill="none" stroke="#ffffff" stroke-width="64" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow)">
-    <path d="M 220 32 L 32 32 L 32 228 L 220 228" />
-    <path d="M 64 130 L 160 130" />
+  <!-- Subtle Premium Frame -->
+  <rect x="24" y="24" width="464" height="464" rx="88" fill="none" stroke="url(#gold)" stroke-width="12" opacity="0.6" />
+
+  <!-- Architecturally perfect, sharp geometric 'E' -->
+  <g transform="translate(156, 130)" fill="url(#gold)" filter="url(#glow)">
+    <path d="M 0 0 L 200 0 L 200 44 L 44 44 L 44 104 L 140 104 L 140 148 L 44 148 L 44 208 L 200 208 L 200 252 L 0 252 Z" />
   </g>
 </svg>
