@@ -502,3 +502,7 @@ def get_pincode_info(pincode):
 if __name__ == '__main__':
     init_db()
     app.run(debug=True, port=5000)
+
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.svg')
