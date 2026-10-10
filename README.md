@@ -93,4 +93,20 @@ Credit is more than purchasing power—it is a daily statement of personal worth
 <div align="center">
   <p><b>Express Financial Services</b> • <i>I Am Worth It</i></p>
   <p>© 2026 Express. Vision, Architecture & Design by <b>Lucky Bodar</b>. All rights reserved.</p>
+
+## 🤝 Contributors
+
+<a href="https://github.com/Lucky-Bodar">
+  <img src="https://github.com/Lucky-Bodar.png" width="80" height="80" style="border-radius: 50%;" alt="Lucky Bodar"/>
+</a>
+<br/>
+<b><a href="https://github.com/Lucky-Bodar">Lucky-Bodar (Lucky Bodar)</a></b>
+<br/>
+<i>Creator, Lead Developer & Visionary</i>
+
+---
+
+<div align="center">
+  <p><b>Express Financial Services</b> • <i>I Am Worth It</i></p>
+  <p>© 2026 Express. Vision, Architecture & Design by <b>Lucky Bodar</b>. All rights reserved.</p>
 </div>
