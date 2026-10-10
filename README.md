@@ -93,12 +93,4 @@ Credit is more than purchasing power—it is a daily statement of personal worth
 <div align="center">
   <p><b>Express Financial Services</b> • <i>I Am Worth It</i></p>
   <p>© 2026 Express. Vision, Architecture & Design by <b>Lucky Bodar</b>. All rights reserved.</p>
-
-
-
----
-
-<div align="center">
-  <p><b>Express Financial Services</b> • <i>I Am Worth It</i></p>
-  <p>© 2026 Express. Vision, Architecture & Design by <b>Lucky Bodar</b>. All rights reserved.</p>
 </div>
